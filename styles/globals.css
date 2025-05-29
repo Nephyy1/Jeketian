@@ -6,7 +6,7 @@
 @tailwind utilities;
 
 body {
-  @apply font-sans bg-slate-50 text-slate-800;
+  @apply font-sans bg-white text-slate-900;
 }
 
 ::-webkit-scrollbar {
