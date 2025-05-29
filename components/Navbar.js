@@ -49,7 +49,7 @@ export default function Navbar() {
       </div>
 
       <div
-        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden bg-white/50 backdrop-blur-md ${isOpen ? 'max-h-screen animate-menu-open shadow-lg' : 'max-h-0 animate-menu-close'}`}
+        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden bg-white/50 backdrop-blur-md ${isOpen ? 'max-h-screen animate-menu-open shadow-burger-open' : 'max-h-0 animate-menu-close'}`}
         id="mobile-menu"
       >
         <div className={`px-2 pt-2 pb-3 sm:px-3 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
