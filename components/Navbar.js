@@ -14,7 +14,7 @@ export default function Navbar() {
   const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100/50";
 
   return (
-    <nav className={`fixed w-full z-50 bg-white/50 backdrop-blur-md ${isOpen ? '' : 'shadow-lg'}`}>
+    <nav className={`fixed w-full z-50 bg-white/50 ${isOpen ? '' : 'shadow-lg backdrop-blur-md'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -49,7 +49,7 @@ export default function Navbar() {
       </div>
 
       <div
-        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden bg-white/50 backdrop-blur-md ${isOpen ? 'max-h-screen animate-menu-open shadow-burger-open' : 'max-h-0 animate-menu-close'}`}
+        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-screen animate-menu-open bg-white/50 backdrop-blur-md shadow-burger-open' : 'max-h-0 animate-menu-close'}`}
         id="mobile-menu"
       >
         <div className={`px-2 pt-2 pb-3 sm:px-3 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
