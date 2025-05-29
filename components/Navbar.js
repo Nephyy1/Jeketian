@@ -14,7 +14,7 @@ export default function Navbar() {
   const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100/50";
 
   return (
-    <nav className="fixed w-full z-50 bg-white/50 backdrop-blur-md shadow-lg">
+    <nav className={`fixed w-full z-50 bg-white/50 backdrop-blur-md ${isOpen ? '' : 'shadow-lg'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
