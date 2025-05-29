@@ -5,20 +5,20 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>JKT48 Fan Hub</title>
+        <title>Jeketian - JKT48 Fan Hub</title>
         <meta name="description" content="Website fan-made JKT48" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Navbar />
 
-      <main className="pt-20 min-h-screen bg-custom-gradient">
+      <main className="pt-20 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           <section className="text-center py-16">
-            <h1 className="text-5xl font-bold text-white mb-6">
-              Selamat Datang di JKT48 Fan Hub!
+            <h1 className="text-5xl font-bold text-slate-900 mb-6">
+              Selamat Datang di Jeketian!
             </h1>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-xl text-slate-700 mb-8">
               Temukan informasi terbaru, jadwal, dan aktivitas member JKT48.
             </p>
             <button className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
@@ -27,7 +27,7 @@ export default function HomePage() {
           </section>
 
           <section className="py-16">
-            <h2 className="text-3xl font-bold text-center text-slate-700 mb-12">
+            <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">
               Konten Utama
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -46,7 +46,7 @@ export default function HomePage() {
       </main>
 
       <footer className="bg-slate-800 text-white text-center p-6">
-        <p>&copy; {new Date().getFullYear()} JKT48 Fan Hub. Dibuat dengan ❤️</p>
+        <p>&copy; {new Date().getFullYear()} Jeketian. Dibuat dengan ❤️</p>
       </footer>
     </>
   );
