@@ -11,7 +11,7 @@ export default function Navbar() {
   };
 
   const navLinkClasses = "text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-2 rounded-md text-sm font-medium";
-  const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100/70";
+  const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100/50";
 
   return (
     <nav className="fixed w-full z-50 bg-white/50 backdrop-blur-md shadow-lg">
@@ -52,7 +52,7 @@ export default function Navbar() {
         className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden bg-white/50 backdrop-blur-md ${isOpen ? 'max-h-screen animate-menu-open shadow-lg' : 'max-h-0 animate-menu-close'}`}
         id="mobile-menu"
       >
-        <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`px-2 pt-2 pb-3 sm:px-3 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
           <Link href="/" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             <FiHome className="mr-3 h-5 w-5" />
             Home
