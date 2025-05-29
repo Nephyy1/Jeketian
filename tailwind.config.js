@@ -29,6 +29,9 @@ module.exports = {
           '100%': { opacity: '0', transform: 'scale(0.95)' },
         },
       },
+      boxShadow: {
+        'burger-open': '0 6px 12px -3px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.08)',
+      }
     },
   },
   plugins: [],
