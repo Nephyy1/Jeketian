@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiMenu, FiX, FiHome, FiUsers, FiCalendar, FiInfo } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiUsers, FiCalendar, FiInfo, FiVideo } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export default function Navbar() {
@@ -11,7 +11,7 @@ export default function Navbar() {
   };
 
   const navLinkClasses = "text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-2 rounded-md text-sm font-medium";
-  const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100"; // Hover solid
+  const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100";
 
   return (
     <nav className={`fixed w-full z-50 bg-white ${isOpen ? '' : 'shadow-lg'}`}>
@@ -31,6 +31,7 @@ export default function Navbar() {
               <Link href="/members" className={navLinkClasses}>Members</Link>
               <Link href="/schedule" className={navLinkClasses}>Schedule</Link>
               <Link href="/news" className={navLinkClasses}>News</Link>
+              <Link href="/live-reply" className={navLinkClasses}>Live & Reply</Link>
             </div>
           </div>
           <div className="md:hidden flex items-center">
@@ -68,6 +69,10 @@ export default function Navbar() {
           <Link href="/news" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             <FiInfo className="mr-3 h-5 w-5" />
             News
+          </Link>
+          <Link href="/live-reply" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
+            <FiVideo className="mr-3 h-5 w-5" />
+            Live & Reply
           </Link>
         </div>
       </div>
