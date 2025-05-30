@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Navbar from '../components/Navbar';
+import BannerSlider from '../components/BannerSlider';
 
 export default function HomePage() {
   return (
@@ -12,9 +13,11 @@ export default function HomePage() {
 
       <Navbar />
 
-      <main className="pt-20 min-h-screen bg-gray-50">
+      <main className="pt-16 min-h-screen bg-gray-50">
+        <BannerSlider />
+
         <div className="container mx-auto px-4 py-8">
-          <section className="text-center py-16">
+          <section className="text-center pt-8 pb-16">
             <h1 className="text-5xl font-bold text-slate-900 mb-6">
               Selamat Datang di <span className="font-brand">Jeketian</span>!
             </h1>
