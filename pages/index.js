@@ -43,8 +43,8 @@ export default function HomePage() {
                 <div className="w-32 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start relative z-10">
-                <div className="order-1 space-y-6"> {/* Kolom Teks Intro */}
+              <div className="grid md:grid-cols-5 gap-8 md:gap-10 lg:gap-12 items-start relative z-10">
+                <div className="order-1 md:col-span-2 space-y-6"> {/* Kolom Teks Intro - mengambil 2/5 bagian */}
                   <h3 className="text-2xl sm:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                     Platform Komunitas Fans JKT48
                   </h3>
@@ -56,7 +56,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 
-                <div className="order-2 space-y-8"> {/* Kolom Video & Fitur */}
+                <div className="order-2 md:col-span-3 space-y-8"> {/* Kolom Video & Fitur - mengambil 3/5 bagian */}
                   <div> {/* Wrapper untuk Video */}
                     <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-xl border-4 border-white bg-black">
                       <video
