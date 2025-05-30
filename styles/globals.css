@@ -28,13 +28,21 @@ body {
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: rgba(0, 0, 0, 0.1); /* Warna hitam sangat tipis/samar */
-  transition: color 0.2s ease-in-out;
+  opacity: 0; /* Tombol tidak terlihat secara default */
+  color: rgba(0, 0, 0, 0.5); /* Warna dasar tombol saat terlihat (hitam semi-transparan) */
+  transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
+/* Tampilkan tombol ketika mouse hover di atas kontainer Swiper */
+.swiper:hover .swiper-button-next,
+.swiper:hover .swiper-button-prev {
+  opacity: 1; /* Tombol menjadi terlihat */
+}
+
+/* Opsional: Ubah sedikit warna saat tombol di-hover secara langsung (setelah terlihat) */
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-  color: rgba(0, 0, 0, 0.35); /* Warna hitam lebih terlihat saat hover */
+  color: rgba(0, 0, 0, 0.7); /* Warna hitam sedikit lebih pekat saat tombol di-hover */
 }
 
 .swiper-pagination-bullet-active {
