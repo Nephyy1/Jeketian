@@ -16,7 +16,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-8">
           <section className="text-center py-16">
             <h1 className="text-5xl font-bold text-slate-900 mb-6">
-              Selamat Datang di Jeketian!
+              Selamat Datang di <span className="font-brand">Jeketian</span>!
             </h1>
             <p className="text-xl text-slate-700 mb-8">
               Temukan informasi terbaru, jadwal, dan aktivitas member JKT48.
@@ -32,7 +32,7 @@ export default function HomePage() {
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                <div key={item} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
                   <h3 className="text-xl font-semibold text-slate-700 mb-3">Judul Konten {item}</h3>
                   <p className="text-slate-600">
                     Ini adalah deskripsi singkat untuk konten yang akan ditampilkan.
