@@ -43,7 +43,7 @@ export default function BannerSlider() {
           disableOnInteraction: false,
         }}
         effect="slide"
-        className="rounded-lg shadow-2xl overflow-hidden"
+        className="rounded-b-lg shadow-2xl overflow-hidden"
       >
         {banners.map((banner) => (
           <SwiperSlide key={banner.id}>
