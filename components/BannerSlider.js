@@ -9,22 +9,28 @@ import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
 import 'swiper/css/effect-fade';
 
+import tokopediaBanner from '../../assets/banners/banner.home.tokopedia.jpg';
+import allintourBanner from '../../assets/banners/banner.home.allintour.jpg';
+import jtrustBanner from '../../assets/banners/banner.home.jtrust.webp';
+import valkyrie48Banner from '../../assets/banners/banner.home.valkyrie48.jpg';
+import jkt48vBanner from '../../assets/banners/banner.home.jkt48v.jpg';
+
 SwiperCore.use([Navigation, Pagination, Autoplay, EffectFade]);
 
 const banners = [
-  { id: 1, src: '/banners/banner.home.tokopedia.jpg', alt: 'Tokopedia Banner' },
-  { id: 2, src: '/banners/banner.home.allintour.png', alt: 'Allintour Banner' },
-  { id: 3, src: '/banners/banner.home.jtrust.webp', alt: 'JTrust Bank Banner' },
-  { id: 4, src: '/banners/banner.home.valkyrie48.jpg', alt: 'Valkyrie48 Banner' },
-  { id: 5, src: '/banners/banner.home.jkt48v.jpg', alt: 'JKT48V Banner' },
+  { id: 1, src: tokopediaBanner, alt: 'Tokopedia Banner' },
+  { id: 2, src: allintourBanner, alt: 'Allintour Banner' },
+  { id: 3, src: jtrustBanner, alt: 'JTrust Bank Banner' },
+  { id: 4, src: valkyrie48Banner, alt: 'Valkyrie48 Banner' },
+  { id: 5, src: jkt48vBanner, alt: 'JKT48V Banner' },
 ];
 
-const BANNER_ASPECT_RATIO_WIDTH = 1200;
-const BANNER_ASPECT_RATIO_HEIGHT = 400;
+const BANNER_ASPECT_RATIO_WIDTH = 1024;
+const BANNER_ASPECT_RATIO_HEIGHT = 591;
 
 export default function BannerSlider() {
   return (
-    <div className="w-full py-4 md:py-6 lg:py-8">
+    <div className="w-full">
       <Swiper
         modules={[Navigation, Pagination, Autoplay, EffectFade]}
         spaceBetween={0}
@@ -48,6 +54,7 @@ export default function BannerSlider() {
                 layout="fill"
                 objectFit="cover"
                 priority={banner.id === 1}
+                placeholder="blur"
               />
             </div>
           </SwiperSlide>
