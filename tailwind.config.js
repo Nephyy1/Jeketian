@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,7 +7,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['"Poppins"', 'sans-serif'],
-        brand: ['"Yuji Syuku"', 'cursive'], // Font baru untuk brand
+        brand: ['"Yuji Syuku"', 'cursive'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -34,5 +33,7 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+  ],
 };
