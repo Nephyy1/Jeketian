@@ -4,9 +4,10 @@ import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiArrowRight, FiRss, FiExternalLink } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
-import { JKT48API } from '@jkt48/core';
+// HAPUS baris ini jika ada: import { JKT48API } from '@jkt48/core';
 
 export async function getServerSideProps() {
+  const { JKT48API } = require('@jkt48/core'); // Gunakan require di sini
   const jkt48Api = new JKT48API();
   const apiKey = "48-NEPHYY";
   let newsItems = [];
