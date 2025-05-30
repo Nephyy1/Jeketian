@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FiMenu, FiX, FiHome, FiUsers, FiCalendar, FiInfo } from 'react-icons/fi';
-import { LuSparkles } from 'react-icons/lu';
+import { LuSparkles } from 'react-icons/lu'; // Anda bisa mengganti ikon brand jika mau
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,16 +11,17 @@ export default function Navbar() {
   };
 
   const navLinkClasses = "text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-2 rounded-md text-sm font-medium";
+  // Opasitas hover disesuaikan dengan opasitas panel menu burger (50%)
   const mobileNavLinkClasses = "flex items-center text-slate-700 hover:text-pink-600 transition-colors duration-300 px-3 py-3 rounded-md text-base font-medium hover:bg-slate-100/50";
 
   return (
-    <nav className={`fixed w-full z-50 bg-white/40 backdrop-blur-md ${isOpen ? '' : 'shadow-lg'}`}>
+    <nav className={`fixed w-full z-50 bg-white/50 backdrop-blur-md ${isOpen ? '' : 'shadow-lg'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="group flex items-center text-2xl font-brand transition-transform duration-200 hover:scale-105">
-              <LuSparkles className="mr-2 h-6 w-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500 group-hover:from-pink-600 group-hover:to-purple-600 transition-all duration-300" />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 group-hover:from-purple-600 group-hover:via-pink-600 group-hover:to-orange-500 transition-all duration-300">
+            <Link href="/" className="group flex items-center text-2xl transition-transform duration-200 hover:scale-105">
+              <LuSparkles className="mr-2 h-6 w-6 text-pink-500 transition-colors duration-300 group-hover:text-pink-400" />
+              <span className="font-brand text-slate-800 group-hover:text-slate-700 transition-colors duration-300">
                 Jeketian
               </span>
             </Link>
