@@ -2,10 +2,44 @@ import Head from 'next/head';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiArrowRight, FiRss, FiExternalLink } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
+import { JKT48API } from '@jkt48/core';
 
-export default function HomePage() {
+export async function getServerSideProps() {
+  const jkt48Api = new JKT48API();
+  const apiKey = "48-NEPHYY";
+  let newsItems = [];
+  let newsError = null;
+
+  try {
+    const newsData = await jkt48Api.news(apiKey);
+    if (newsData && newsData.data) {
+      newsItems = newsData.data.slice(0, 6);
+    } else {
+      newsItems = [];
+      console.warn("News data is empty or not in expected format:", newsData);
+    }
+  } catch (error) {
+    console.error("Error fetching news:", error);
+    newsError = "Gagal memuat berita terkini.";
+  }
+
+  return {
+    props: {
+      newsItems,
+      newsError,
+    },
+  };
+}
+
+export default function HomePage({ newsItems, newsError }) {
+  const formatDate = (dateString) => {
+    if (!dateString) return "Tanggal tidak tersedia";
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('id-ID', options);
+  };
+
   return (
     <>
       <Head>
@@ -44,7 +78,7 @@ export default function HomePage() {
               </div>
 
               <div className="grid md:grid-cols-5 gap-8 md:gap-10 lg:gap-12 items-start relative z-10">
-                <div className="order-1 md:col-span-2 space-y-6"> {/* Kolom Teks Intro - mengambil 2/5 bagian */}
+                <div className="order-1 md:col-span-2 space-y-6">
                   <h3 className="text-2xl sm:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                     Platform Komunitas Fans JKT48
                   </h3>
@@ -56,8 +90,8 @@ export default function HomePage() {
                   </p>
                 </div>
                 
-                <div className="order-2 md:col-span-3 space-y-8"> {/* Kolom Video & Fitur - mengambil 3/5 bagian */}
-                  <div> {/* Wrapper untuk Video */}
+                <div className="order-2 md:col-span-3 space-y-8">
+                  <div>
                     <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-xl border-4 border-white bg-black">
                       <video
                         className="w-full h-full object-contain"
@@ -73,7 +107,7 @@ export default function HomePage() {
                     </p>
                   </div>
 
-                  <div> {/* Wrapper untuk Fitur Unggulan */}
+                  <div>
                     <h4 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-4 mt-6 md:mt-0">
                       Fitur Unggulan Kami:
                     </h4>
@@ -102,20 +136,59 @@ export default function HomePage() {
           </section>
 
           <section className="py-12 md:py-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-800 mb-12">
-              Konten Utama
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                  <h3 className="text-xl font-semibold text-slate-700 mb-3">Judul Konten {item}</h3>
-                  <p className="text-slate-600">
-                    Ini adalah deskripsi singkat untuk konten yang akan ditampilkan.
-                  </p>
-                </div>
-              ))}
+            <div className="flex items-center justify-center mb-10 md:mb-12">
+              <FiRss className="text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mr-3" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-amber-400">
+                Hot News JKT48
+              </h2>
             </div>
+
+            {newsError && (
+              <p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{newsError}</p>
+            )}
+
+            {!newsError && newsItems && newsItems.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {newsItems.map((item) => (
+                  <a 
+                    key={item.id || item.title} 
+                    href={item.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1"
+                  >
+                    {item.thumbnail && (
+                      <div className="w-full h-48 relative overflow-hidden">
+                        <Image 
+                          src={item.thumbnail} 
+                          alt={item.title || 'News thumbnail'} 
+                          layout="fill" 
+                          objectFit="cover"
+                          className="group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    <div className="p-5">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-2 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
+                        {item.title || "Judul tidak tersedia"}
+                      </h3>
+                      <p className="text-xs text-slate-500 mb-3 flex items-center">
+                        <FiCalendar className="mr-2 text-slate-400" />
+                        {formatDate(item.date)}
+                      </p>
+                      <div className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
+                        Baca Selengkapnya
+                        <FiExternalLink className="ml-2 h-4 w-4" />
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              !newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>
+            )}
           </section>
+          
         </div>
       </main>
 
