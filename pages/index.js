@@ -52,27 +52,27 @@ export default function HomePage() {
                     <p className="text-base sm:text-lg text-slate-700 leading-relaxed mb-3">
                       <strong>Jeketian</strong> adalah ruang digital yang diciptakan dengan penuh cinta oleh penggemar, untuk penggemar JKT48. Kami hadir untuk menjadi sumber informasi terpadu dan terkini bagi Anda semua.
                     </p>
-                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-4">
+                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-6">
                       Temukan semua yang Anda butuhkan di sini:
                     </p>
-                    <ul className="space-y-3 text-slate-600 text-base sm:text-lg">
-                      <li className="flex items-start group cursor-default">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-slate-600 text-base sm:text-lg">
+                      <div className="flex items-start group cursor-default">
                         <FiUsers className="text-pink-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
                         <span className="group-hover:text-pink-700 transition-colors duration-200">Informasi lengkap dan update aktivitas para member JKT48.</span>
-                      </li>
-                      <li className="flex items-start group cursor-default">
+                      </div>
+                      <div className="flex items-start group cursor-default">
                         <FiCalendar className="text-purple-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
                         <span className="group-hover:text-purple-700 transition-colors duration-200">Jadwal pertunjukan teater, event spesial, dan penampilan live.</span>
-                      </li>
-                      <li className="flex items-start group cursor-default">
+                      </div>
+                      <div className="flex items-start group cursor-default">
                         <FiInfo className="text-orange-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
                         <span className="group-hover:text-orange-700 transition-colors duration-200">Berita terbaru dan semua pengumuman resmi dari JKT48.</span>
-                      </li>
-                      <li className="flex items-start group cursor-default">
+                      </div>
+                      <div className="flex items-start group cursor-default">
                         <FiFilm className="text-red-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
                         <span className="group-hover:text-red-700 transition-colors duration-200">Akses mudah ke konten Live Streaming dan siaran ulang (Replay) penampilan idola Anda.</span>
-                      </li>
-                    </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="order-2">
