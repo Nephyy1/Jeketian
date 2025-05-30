@@ -48,6 +48,7 @@ export default function BannerSlider() {
                 layout="fill"
                 objectFit="cover"
                 priority={banner.id === 1}
+                placeholder="blur" 
               />
             </div>
           </SwiperSlide>
