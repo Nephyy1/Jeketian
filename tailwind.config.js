@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['"Poppins"', 'sans-serif'],
-        brand: ['"Pacifico"', 'cursive'],
+        brand: ['"Yuji Syuku"', 'cursive'], // Font baru untuk brand
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
