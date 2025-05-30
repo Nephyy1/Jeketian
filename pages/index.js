@@ -12,18 +12,45 @@ export async function getServerSideProps() {
   let newsItems = [];
   let newsError = null;
 
+  console.log("[getServerSideProps] Attempting to fetch news with API key:", apiKey);
+
   try {
-    const newsData = await jkt48Api.news(apiKey);
-    if (newsData && newsData.data) {
-      newsItems = newsData.data.slice(0, 6);
-    } else {
+    const newsDataResponse = await jkt48Api.news(apiKey);
+    console.log("[getServerSideProps] Raw newsDataResponse from API:", JSON.stringify(newsDataResponse, null, 2));
+
+    if (newsDataResponse && newsDataResponse.data && Array.isArray(newsDataResponse.data)) {
+      newsItems = newsDataResponse.data.slice(0, 6);
+      if (newsItems.length === 0 && newsDataResponse.data.length > 0) {
+        console.warn("[getServerSideProps] News data was an array, but slice(0,6) resulted in empty. Original length:", newsDataResponse.data.length);
+      } else if (newsItems.length === 0) {
+        console.warn("[getServerSideProps] API returned data, but it's an empty array.");
+      }
+    } else if (newsDataResponse && typeof newsDataResponse === 'object' && !Array.isArray(newsDataResponse.data)) {
+      console.warn("[getServerSideProps] News API response received, but 'data' property is missing or not an array. Response:", newsDataResponse);
+      newsError = "Format data berita tidak sesuai dari API.";
       newsItems = [];
-      console.warn("News data is empty or not in expected format:", newsData);
+    } else if (!newsDataResponse) {
+      console.warn("[getServerSideProps] News API returned no response (null or undefined).");
+      newsError = "Tidak ada respons dari API berita.";
+      newsItems = [];
+    } else {
+      console.warn("[getServerSideProps] News data is not in the expected array format. Full response:", newsDataResponse);
+      newsError = "Format data berita tidak dikenal.";
+      newsItems = [];
     }
   } catch (error) {
-    console.error("Error fetching news:", error);
-    newsError = "Gagal memuat berita terkini.";
+    console.error("[getServerSideProps] Error fetching news:", error.message);
+    if (error.stack) {
+      console.error("[getServerSideProps] Error stack:", error.stack);
+    }
+    if (error.response && error.response.data) {
+      console.error("[getServerSideProps] API error response data:", JSON.stringify(error.response.data, null, 2));
+    }
+    newsError = `Gagal memuat berita: ${error.message || "Terjadi kesalahan pada server."}`;
+    newsItems = [];
   }
+
+  console.log("[getServerSideProps] Returning props: newsError:", newsError, "newsItems count:", newsItems.length);
 
   return {
     props: {
