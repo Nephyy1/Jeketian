@@ -13,6 +13,10 @@ module.exports = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'custom-gradient': 'linear-gradient(to right, #ff7e5f, #feb47b)',
+        'subtle-grid': [
+          "linear-gradient(to right, theme('colors.slate.200') 1px, transparent 1px)",
+          "linear-gradient(to bottom, theme('colors.slate.200') 1px, transparent 1px)"
+        ],
       },
       animation: {
         'menu-open': 'menu-open 0.3s ease-out',
