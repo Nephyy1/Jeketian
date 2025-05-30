@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
-import Image from 'next/image'; // Impor Image dari next/image
+import Image from 'next/image';
 import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo } from 'react-icons/fi';
-import { LuSparkles } from 'react-icons/lu'; // Impor LuSparkles untuk judul
+import { LuSparkles } from 'react-icons/lu';
 
 export default function HomePage() {
   return (
@@ -20,13 +20,11 @@ export default function HomePage() {
         <BannerSlider />
 
         <div className="container mx-auto px-4">
-          {/* Bagian Selamat Datang DIHAPUS */}
-
-          {/* Bagian Tentang Jeketian - DIMODIFIKASI */}
+          
           <section className="py-12 md:py-20 lg:py-24">
-            <div className="bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 p-6 sm:p-8 md:p-12 rounded-2xl shadow-2xl">
+            <div className="bg-slate-50 bg-subtle-grid bg-[length:2.5rem_2.5rem] p-6 sm:p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden">
               
-              <div className="flex justify-center mb-6 md:mb-8">
+              <div className="flex justify-center mb-6 md:mb-8 relative z-10">
                 <Image
                   src="/img/logo.jpg"
                   alt="Jeketian Logo"
@@ -36,40 +34,46 @@ export default function HomePage() {
                 />
               </div>
 
-              <h2 className="text-4xl sm:text-5xl font-bold mb-10 sm:mb-12 md:mb-16 text-center flex items-center justify-center">
+              <h2 className="text-4xl sm:text-5xl font-bold text-center flex items-center justify-center mb-4 relative z-10">
                 <LuSparkles className="mr-2 sm:mr-3 text-pink-500 text-4xl sm:text-5xl" />
                 <span className="font-brand text-slate-800">Jeketian</span>
               </h2>
 
-              <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
-                <div className="order-1">
-                  <h3 className="text-2xl sm:text-3xl font-semibold mb-4 text-slate-700">
+              <div className="flex justify-center mb-10 sm:mb-12 md:mb-16 relative z-10">
+                <div className="w-32 h-1 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full"></div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start relative z-10">
+                <div className="order-1 space-y-6">
+                  <h3 className="text-2xl sm:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                     Platform Komunitas Fans JKT48
                   </h3>
-                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-3">
-                    <strong>Jeketian</strong> adalah ruang digital yang diciptakan dengan penuh cinta oleh penggemar, untuk penggemar JKT48. Kami hadir untuk menjadi sumber informasi terpadu dan terkini bagi Anda semua.
-                  </p>
-                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-4">
-                    Temukan semua yang Anda butuhkan di sini:
-                  </p>
-                  <ul className="space-y-3 text-slate-600 text-base sm:text-lg">
-                    <li className="flex items-start">
-                      <FiUsers className="text-pink-500 mr-3 mt-1 flex-shrink-0 text-xl" />
-                      <span>Informasi lengkap dan update aktivitas para member JKT48.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <FiCalendar className="text-purple-500 mr-3 mt-1 flex-shrink-0 text-xl" />
-                      <span>Jadwal pertunjukan teater, event spesial, dan penampilan live.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <FiInfo className="text-orange-500 mr-3 mt-1 flex-shrink-0 text-xl" />
-                      <span>Berita terbaru dan semua pengumuman resmi dari JKT48.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <FiFilm className="text-red-500 mr-3 mt-1 flex-shrink-0 text-xl" />
-                      <span>Akses mudah ke konten Live Streaming dan siaran ulang (Replay) penampilan idola Anda.</span>
-                    </li>
-                  </ul>
+                  <div>
+                    <p className="text-base sm:text-lg text-slate-700 leading-relaxed mb-3">
+                      <strong>Jeketian</strong> adalah ruang digital yang diciptakan dengan penuh cinta oleh penggemar, untuk penggemar JKT48. Kami hadir untuk menjadi sumber informasi terpadu dan terkini bagi Anda semua.
+                    </p>
+                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-4">
+                      Temukan semua yang Anda butuhkan di sini:
+                    </p>
+                    <ul className="space-y-3 text-slate-600 text-base sm:text-lg">
+                      <li className="flex items-start group cursor-default">
+                        <FiUsers className="text-pink-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
+                        <span className="group-hover:text-pink-700 transition-colors duration-200">Informasi lengkap dan update aktivitas para member JKT48.</span>
+                      </li>
+                      <li className="flex items-start group cursor-default">
+                        <FiCalendar className="text-purple-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
+                        <span className="group-hover:text-purple-700 transition-colors duration-200">Jadwal pertunjukan teater, event spesial, dan penampilan live.</span>
+                      </li>
+                      <li className="flex items-start group cursor-default">
+                        <FiInfo className="text-orange-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
+                        <span className="group-hover:text-orange-700 transition-colors duration-200">Berita terbaru dan semua pengumuman resmi dari JKT48.</span>
+                      </li>
+                      <li className="flex items-start group cursor-default">
+                        <FiFilm className="text-red-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
+                        <span className="group-hover:text-red-700 transition-colors duration-200">Akses mudah ke konten Live Streaming dan siaran ulang (Replay) penampilan idola Anda.</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 <div className="order-2">
                   <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-xl border-4 border-white bg-black">
