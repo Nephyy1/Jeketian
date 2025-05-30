@@ -28,14 +28,16 @@ body {
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #ec4899;
+  /* Warna pink (ec4899) dengan opasitas 50% */
+  color: rgba(236, 72, 153, 0.5);
 }
 
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-  color: #d9307a;
+  /* Warna pink (ec4899) dengan opasitas 75% saat hover untuk sedikit lebih terlihat */
+  color: rgba(236, 72, 153, 0.75);
 }
 
 .swiper-pagination-bullet-active {
-  background-color: #ec4899 !important;
+  background-color: #ec4899 !important; /* Bullet pagination tetap solid untuk kejelasan */
 }
