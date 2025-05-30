@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiArrowRight, FiRss, FiExternalLink } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
@@ -12,30 +12,25 @@ export async function getServerSideProps() {
   let newsError = null;
 
   console.log("[getServerSideProps] Attempting to fetch news with API key:", apiKey);
-  console.log("[getServerSideProps] typeof jkt48Api:", typeof jkt48Api);
   if (jkt48Api) {
     console.log("[getServerSideProps] jkt48Api methods:", Object.keys(jkt48Api));
   }
-
 
   try {
     if (jkt48Api && typeof jkt48Api.news === 'function') {
       const newsDataResponse = await jkt48Api.news(apiKey);
       console.log("[getServerSideProps] Raw newsDataResponse from API:", JSON.stringify(newsDataResponse, null, 2));
 
-      if (newsDataResponse && newsDataResponse.data && Array.isArray(newsDataResponse.data)) {
-        newsItems = newsDataResponse.data.slice(0, 6);
-        if (newsItems.length === 0 && newsDataResponse.data.length > 0) {
-          console.warn("[getServerSideProps] News data was an array, but slice(0,6) resulted in empty. Original length:", newsDataResponse.data.length);
+      if (newsDataResponse && newsDataResponse.news && Array.isArray(newsDataResponse.news)) {
+        newsItems = newsDataResponse.news.slice(0, 6);
+        if (newsItems.length === 0 && newsDataResponse.news.length > 0) {
+          console.warn("[getServerSideProps] News data was an array, but slice(0,6) resulted in empty. Original length:", newsDataResponse.news.length);
         } else if (newsItems.length === 0) {
-          console.warn("[getServerSideProps] API returned data, but it's an empty array.");
+          console.warn("[getServerSideProps] API returned data (news property), but it's an empty array.");
         }
-      } else if (newsDataResponse && typeof newsDataResponse === 'object' && newsDataResponse.data === null) {
-        console.warn("[getServerSideProps] News API response received, but 'data' property is null. Response:", newsDataResponse);
-        newsItems = [];
-      } else if (newsDataResponse && typeof newsDataResponse === 'object' && (newsDataResponse.data === undefined || !Array.isArray(newsDataResponse.data))) {
-        console.warn("[getServerSideProps] News API response received, but 'data' property is missing or not an array. Response:", newsDataResponse);
-        newsError = "Format data berita tidak sesuai dari API.";
+      } else if (newsDataResponse && typeof newsDataResponse === 'object' && (newsDataResponse.news === undefined || !Array.isArray(newsDataResponse.news))) {
+        console.warn("[getServerSideProps] News API response received, but 'news' property is missing or not an array. Response:", newsDataResponse);
+        newsError = "Format data berita tidak sesuai dari API (struktur 'news' tidak ditemukan).";
         newsItems = [];
       } else if (!newsDataResponse) {
         console.warn("[getServerSideProps] News API returned no response (null or undefined).");
@@ -190,38 +185,32 @@ export default function HomePage({ newsItems, newsError }) {
             {!newsError && newsItems && newsItems.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {newsItems.map((item) => (
-                  <a 
-                    key={item.id || item.title} 
-                    href={item.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-1"
+                  <div 
+                    key={item.id || item.title}
+                    className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"
                   >
-                    {item.thumbnail && (
-                      <div className="w-full h-48 relative overflow-hidden">
-                        <Image 
-                          src={item.thumbnail} 
-                          alt={item.title || 'News thumbnail'} 
-                          layout="fill" 
-                          objectFit="cover"
-                          className="group-hover:scale-105 transition-transform duration-300"
-                        />
+                    <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">
+                          {item.title || "Judul tidak tersedia"}
+                        </h3>
+                        <p className="text-xs text-slate-500 mb-3 flex items-center">
+                          <FiCalendar className="mr-2 text-slate-400" />
+                          {formatDate(item.date)}
+                        </p>
+                        {item.label && (
+                          <p className="text-xs text-gray-500 mt-1 italic">
+                            Kategori: <span className="font-mono bg-slate-100 px-1 py-0.5 rounded text-gray-600">{item.label}</span>
+                          </p>
+                        )}
                       </div>
-                    )}
-                    <div className="p-5">
-                      <h3 className="text-lg font-semibold text-slate-800 mb-2 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
-                        {item.title || "Judul tidak tersedia"}
-                      </h3>
-                      <p className="text-xs text-slate-500 mb-3 flex items-center">
-                        <FiCalendar className="mr-2 text-slate-400" />
-                        {formatDate(item.date)}
-                      </p>
-                      <div className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
-                        Baca Selengkapnya
-                        <FiExternalLink className="ml-2 h-4 w-4" />
+                      <div className="mt-4">
+                        <span className="inline-flex items-center text-sm text-gray-400 font-medium">
+                          (Info: URL artikel tidak tersedia dari API ini)
+                        </span>
                       </div>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             ) : (
