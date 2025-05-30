@@ -4,39 +4,51 @@ import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiArrowRight, FiRss, FiExternalLink } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
-// HAPUS baris ini jika ada: import { JKT48API } from '@jkt48/core';
 
 export async function getServerSideProps() {
-  const { JKT48API } = require('@jkt48/core'); // Gunakan require di sini
-  const jkt48Api = new JKT48API();
+  const jkt48Api = require('@jkt48/core');
   const apiKey = "48-NEPHYY";
   let newsItems = [];
   let newsError = null;
 
   console.log("[getServerSideProps] Attempting to fetch news with API key:", apiKey);
+  console.log("[getServerSideProps] typeof jkt48Api:", typeof jkt48Api);
+  if (jkt48Api) {
+    console.log("[getServerSideProps] jkt48Api methods:", Object.keys(jkt48Api));
+  }
+
 
   try {
-    const newsDataResponse = await jkt48Api.news(apiKey);
-    console.log("[getServerSideProps] Raw newsDataResponse from API:", JSON.stringify(newsDataResponse, null, 2));
+    if (jkt48Api && typeof jkt48Api.news === 'function') {
+      const newsDataResponse = await jkt48Api.news(apiKey);
+      console.log("[getServerSideProps] Raw newsDataResponse from API:", JSON.stringify(newsDataResponse, null, 2));
 
-    if (newsDataResponse && newsDataResponse.data && Array.isArray(newsDataResponse.data)) {
-      newsItems = newsDataResponse.data.slice(0, 6);
-      if (newsItems.length === 0 && newsDataResponse.data.length > 0) {
-        console.warn("[getServerSideProps] News data was an array, but slice(0,6) resulted in empty. Original length:", newsDataResponse.data.length);
-      } else if (newsItems.length === 0) {
-        console.warn("[getServerSideProps] API returned data, but it's an empty array.");
+      if (newsDataResponse && newsDataResponse.data && Array.isArray(newsDataResponse.data)) {
+        newsItems = newsDataResponse.data.slice(0, 6);
+        if (newsItems.length === 0 && newsDataResponse.data.length > 0) {
+          console.warn("[getServerSideProps] News data was an array, but slice(0,6) resulted in empty. Original length:", newsDataResponse.data.length);
+        } else if (newsItems.length === 0) {
+          console.warn("[getServerSideProps] API returned data, but it's an empty array.");
+        }
+      } else if (newsDataResponse && typeof newsDataResponse === 'object' && newsDataResponse.data === null) {
+        console.warn("[getServerSideProps] News API response received, but 'data' property is null. Response:", newsDataResponse);
+        newsItems = [];
+      } else if (newsDataResponse && typeof newsDataResponse === 'object' && (newsDataResponse.data === undefined || !Array.isArray(newsDataResponse.data))) {
+        console.warn("[getServerSideProps] News API response received, but 'data' property is missing or not an array. Response:", newsDataResponse);
+        newsError = "Format data berita tidak sesuai dari API.";
+        newsItems = [];
+      } else if (!newsDataResponse) {
+        console.warn("[getServerSideProps] News API returned no response (null or undefined).");
+        newsError = "Tidak ada respons dari API berita.";
+        newsItems = [];
+      } else {
+        console.warn("[getServerSideProps] News data is not in the expected array format or is missing. Full response:", newsDataResponse);
+        newsError = "Format data berita tidak dikenal atau data tidak ditemukan.";
+        newsItems = [];
       }
-    } else if (newsDataResponse && typeof newsDataResponse === 'object' && !Array.isArray(newsDataResponse.data)) {
-      console.warn("[getServerSideProps] News API response received, but 'data' property is missing or not an array. Response:", newsDataResponse);
-      newsError = "Format data berita tidak sesuai dari API.";
-      newsItems = [];
-    } else if (!newsDataResponse) {
-      console.warn("[getServerSideProps] News API returned no response (null or undefined).");
-      newsError = "Tidak ada respons dari API berita.";
-      newsItems = [];
     } else {
-      console.warn("[getServerSideProps] News data is not in the expected array format. Full response:", newsDataResponse);
-      newsError = "Format data berita tidak dikenal.";
+      console.error("[getServerSideProps] 'jkt48Api.news' is not a function or jkt48Api is not defined as expected. jkt48Api:", jkt48Api);
+      newsError = "Metode untuk mengambil berita tidak tersedia pada package API.";
       newsItems = [];
     }
   } catch (error) {
