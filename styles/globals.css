@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap'); /* Impor font Yuji Syuku */
+@import url('https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -24,4 +24,18 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #ec4899;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #d9307a;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #ec4899 !important;
 }
