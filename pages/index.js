@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiMapPin, FiClock } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiMapPin } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
@@ -64,7 +64,7 @@ export async function getServerSideProps() {
       if (jkt48Api && typeof jkt48Api.events === 'function') {
         console.log("[getServerSideProps] Attempting to fetch events...");
         const eventDataResponse = await jkt48Api.events(apiKey);
-        console.log("[getServerSideProps] Raw eventDataResponse from API:", JSON.stringify(eventDataResponse, null, 2));
+        console.log("[getServerSideProps] Raw eventDataResponse from API (should be an array):", JSON.stringify(eventDataResponse, null, 2));
         
         if (eventDataResponse && Array.isArray(eventDataResponse)) {
           eventItems = eventDataResponse.slice(0, 4);
@@ -72,7 +72,7 @@ export async function getServerSideProps() {
            eventItems = eventDataResponse.events.slice(0, 4);
         } else {
           console.warn("[getServerSideProps] Event data is not in expected array format. Response:", eventDataResponse);
-          eventError = "Format data event tidak sesuai.";
+          eventError = "Format data event tidak sesuai atau API event bermasalah.";
           eventItems = [];
         }
       } else {
@@ -110,6 +110,7 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
       options.hour = '2-digit';
       options.minute = '2-digit';
       options.hour12 = false;
+      options.timeZone = 'Asia/Jakarta';
     }
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
@@ -251,11 +252,11 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
                                   <span className="mr-1.5">Kategori:</span>
                                   <Image
                                     src={localIconPath}
-                                    alt="Ikon Kategori"
+                                    alt="Ikon Kategori Berita"
                                     width={40}
                                     height={40}
                                     className="inline-block object-contain"
-                                    onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal: ${localIconPath}`); }}
+                                    onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal BERITA: ${localIconPath}`); }}
                                   />
                                 </div>
                               )}
@@ -286,8 +287,8 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 drop-shadow-sm relative" style={{ left: '3px' }}>
-                    <FiZap className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 via-teal-400 to-green-400 mr-2 sm:mr-3 drop-shadow-sm" />
+                  <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '3px' }}>
+                    <FiCalendar className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
                     Jadwal Event Mendatang
                   </h2>
                 </div>
@@ -298,50 +299,61 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
 
                 {!eventError && eventItems && eventItems.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-                    {eventItems.map((event) => (
-                      <div 
-                        key={event.id || event.title || event.name}
-                        className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden"
-                      >
-                        <div className="p-0.5 bg-gradient-to-r from-blue-500 via-teal-400 to-green-400">
-                            <div className="bg-slate-800 px-5 py-3">
-                                <h3 className="text-lg font-semibold text-white leading-tight truncate group-hover:text-teal-300 transition-colors duration-300">
-                                    {event.title || event.name || "Nama Event Tidak Tersedia"}
-                                </h3>
+                    {eventItems.map((event) => {
+                      let localEventIconPath = null;
+                      if (event.label) {
+                        const labelUrlParts = event.label.split('/');
+                        const eventLabelFilename = labelUrlParts.pop();
+                        if (eventLabelFilename) {
+                            localEventIconPath = `/img/${eventLabelFilename}`;
+                        }
+                      }
+
+                      return (
+                        <div 
+                          key={event.id}
+                          className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden"
+                        >
+                          <div className="h-2 bg-gradient-to-r from-pink-500 via-red-500 to-orange-400"></div>
+                          <div className="p-5 space-y-3">
+                            <h3 className="text-lg font-semibold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight truncate">
+                                {event.title || "Nama Event Tidak Tersedia"}
+                            </h3>
+                            <div className="flex items-center text-sm text-slate-500">
+                              <FiCalendar className="mr-2 text-pink-500 flex-shrink-0" />
+                              <span>{formatDate(event.date, true)}</span>
                             </div>
+                            {localEventIconPath && (
+                              <div className="flex items-center text-xs text-gray-500">
+                                <span className="mr-1.5">Kategori Event:</span>
+                                <Image
+                                  src={localEventIconPath}
+                                  alt="Ikon Kategori Event"
+                                  width={20}
+                                  height={20}
+                                  className="mr-1.5 object-contain"
+                                  onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori EVENT lokal: ${localEventIconPath}`); }}
+                                />
+                              </div>
+                            )}
+                            {event.url && (
+                              <a 
+                                href={event.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-sm text-pink-600 hover:text-purple-700 font-medium transition-colors duration-300 mt-2 group/link"
+                              >
+                                Lihat Detail Event
+                                <FiExternalLink className="ml-1.5 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" />
+                              </a>
+                            )}
+                          </div>
                         </div>
-                        <div className="p-5 space-y-3">
-                          <p className="text-sm text-slate-600 flex items-center">
-                            <FiCalendar className="mr-2 text-teal-500 flex-shrink-0" />
-                            {formatDate(event.date, true)} 
-                          </p>
-                          {event.location && (
-                            <p className="text-sm text-slate-600 flex items-start">
-                              <FiMapPin className="mr-2 mt-0.5 text-teal-500 flex-shrink-0" />
-                              <span>{event.location}</span>
-                            </p>
-                          )}
-                          {event.url ? (
-                            <a 
-                              href={event.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center text-sm text-teal-500 hover:text-teal-700 font-medium transition-colors duration-300 mt-2"
-                            >
-                              Lihat Detail Event
-                              <FiExternalLink className="ml-2 h-4 w-4" />
-                            </a>
-                          ) : (
-                            <span className="inline-flex items-center text-sm text-gray-400 font-medium mt-2">
-                                (Detail URL tidak tersedia)
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  !eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang.</p>
+                  !eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>
                 )}
               </section>
               
