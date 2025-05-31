@@ -173,8 +173,8 @@ export default function HomePage({ newsItems, newsError }) {
 
           <section className="py-12 md:py-16">
             <div className="flex items-center justify-center mb-10 md:mb-12">
-              <FiRss className="text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mr-3" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-amber-400">
+              <FiRss className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-3 drop-shadow-sm" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
                 Hot News JKT48
               </h2>
             </div>
