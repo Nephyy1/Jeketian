@@ -111,7 +111,7 @@ export default function NewsDetailPage({ newsDetailData, newsDetailError, newsId
   }
   
   const detail = newsDetailData.data && newsDetailData.data[0] ? newsDetailData.data[0] : newsDetailData;
-  const { title, date, content, author, image } = detail;
+  const { title, date, content, image } = detail;
 
   return (
     <>
@@ -141,11 +141,9 @@ export default function NewsDetailPage({ newsDetailData, newsDetailError, newsId
                     <FiCalendar className="mr-1.5 text-slate-400" /> {formatDate(date)}
                 </span>
                 )}
-                {author && (typeof author === 'string' ? author : author.name) && (
                 <span className="flex items-center whitespace-nowrap">
-                    <FiUser className="mr-1.5 text-slate-400" /> {typeof author === 'string' ? author : author.name}
+                    <FiUser className="mr-1.5 text-slate-400" /> Jeketian - Nephyy
                 </span>
-                )}
             </div>
 
             {image && (
