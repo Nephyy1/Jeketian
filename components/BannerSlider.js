@@ -1,19 +1,14 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
-import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import Image from 'next/image';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
-import 'swiper/css/effect-fade';
-
-SwiperCore.use([Navigation, Pagination, Autoplay, EffectFade]);
 
 const banners = [
   { id: 1, src: '/banners/banner.home.tokopedia.jpg', alt: 'Tokopedia Banner' },
-  { id: 2, src: '/banners/banner.home.allintour.png', alt: 'Allintour Banner' },
+  { id: 2, src: '/banners/banner.home.allintour.jpg', alt: 'Allintour Banner' },
   { id: 3, src: '/banners/banner.home.jtrust.webp', alt: 'JTrust Bank Banner' },
   { id: 4, src: '/banners/banner.home.valkyrie48.jpg', alt: 'Valkyrie48 Banner' },
   { id: 5, src: '/banners/banner.home.jkt48v.jpg', alt: 'JKT48V Banner' },
@@ -26,10 +21,10 @@ export default function BannerSlider() {
   return (
     <div className="w-full">
       <Swiper
-        modules={[Navigation, Pagination, Autoplay, EffectFade]}
+        modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={0}
         slidesPerView={1}
-        navigation
+        navigation={true}
         pagination={{ clickable: true }}
         loop={true}
         autoplay={{
@@ -48,7 +43,7 @@ export default function BannerSlider() {
                 layout="fill"
                 objectFit="cover"
                 priority={banner.id === 1}
-                placeholder="blur" 
+                placeholder="blur"
               />
             </div>
           </SwiperSlide>
