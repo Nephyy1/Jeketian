@@ -172,9 +172,9 @@ export default function HomePage({ newsItems, newsError }) {
           </section>
 
           <section className="py-12 md:py-16">
-            <div className="flex items-center justify-center mb-10 md:mb-12">
-              <FiRss className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-3 drop-shadow-sm" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
+            <div className="text-center mb-10 md:mb-12">
+              <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
+                <FiRss className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
                 Hot News JKT48
               </h2>
             </div>
@@ -215,8 +215,8 @@ export default function HomePage({ newsItems, newsError }) {
                               <Image
                                 src={localIconPath}
                                 alt="Ikon Kategori"
-                                width={16}
-                                height={16}
+                                width={20}
+                                height={20}
                                 className="inline-block object-contain"
                                 onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal: ${localIconPath}`); }}
                               />
