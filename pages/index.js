@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiArrowLeft, FiFlame } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiCalendar, FiInfo, FiExternalLink, FiFlame } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
