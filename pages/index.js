@@ -43,9 +43,9 @@ export async function getServerSideProps() {
     if (jkt48Api && typeof jkt48Api.events === 'function') {
       const eventDataResponse = await jkt48Api.events(apiKey);
       console.log("[getServerSideProps] Raw eventDataResponse from API:", JSON.stringify(eventDataResponse, null, 2));
-      if (eventDataResponse && Array.isArray(eventDataResponse)) { // Asumsi eventDataResponse adalah array langsung
-        eventItems = eventDataResponse.slice(0, 4); // Ambil 4 event terbaru/mendatang
-      } else if (eventDataResponse && eventDataResponse.events && Array.isArray(eventDataResponse.events)) { // Alternatif jika ada di dalam properti 'events'
+      if (eventDataResponse && Array.isArray(eventDataResponse)) {
+        eventItems = eventDataResponse.slice(0, 4);
+      } else if (eventDataResponse && eventDataResponse.events && Array.isArray(eventDataResponse.events)) {
          eventItems = eventDataResponse.events.slice(0, 4);
       }
        else {
@@ -247,9 +247,9 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError 
           </section>
 
           <section className="py-12 md:py-16">
-            <div className="flex items-center justify-center mb-10 md:mb-12">
-              <FiZap className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 via-teal-400 to-green-400 mr-3 drop-shadow-sm" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 drop-shadow-sm">
+            <div className="text-center mb-10 md:mb-12">
+              <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 drop-shadow-sm relative" style={{ left: '3px' }}>
+                <FiZap className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 via-teal-400 to-green-400 mr-2 sm:mr-3 drop-shadow-sm" />
                 Jadwal Event Mendatang
               </h2>
             </div>
