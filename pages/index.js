@@ -1,8 +1,9 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiArrowLeft } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
@@ -199,15 +200,32 @@ export default function HomePage({ newsItems, newsError }) {
                           {formatDate(item.date)}
                         </p>
                         {item.label && (
-                          <p className="text-xs text-gray-500 mt-1 italic">
-                            Kategori: <span className="font-mono bg-slate-100 px-1 py-0.5 rounded text-gray-600">{item.label}</span>
-                          </p>
+                          <div className="mt-2 flex items-center text-xs text-gray-500">
+                            <span className="mr-1.5">Kategori:</span>
+                            <Image
+                              src={`https://jkt48.com${item.label}`}
+                              alt="Ikon Kategori"
+                              width={16}
+                              height={16}
+                              className="inline-block object-contain"
+                              onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori dari jkt48.com untuk label: ${item.label}`); }}
+                            />
+                          </div>
                         )}
                       </div>
                       <div className="mt-4">
-                        <span className="inline-flex items-center text-sm text-gray-400 font-medium">
-                          (Info: URL artikel tidak tersedia dari API ini)
-                        </span>
+                        {item.id ? (
+                          <Link href={`/news/${item.id}`} legacyBehavior>
+                            <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
+                              Baca Selengkapnya
+                              <FiExternalLink className="ml-2 h-4 w-4" />
+                            </a>
+                          </Link>
+                        ) : (
+                          <span className="inline-flex items-center text-sm text-gray-400 font-medium">
+                            (Detail tidak tersedia)
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
