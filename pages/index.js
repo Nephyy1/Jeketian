@@ -39,27 +39,45 @@ export async function getServerSideProps() {
     newsError = `Gagal memuat berita: ${error.message || "Kesalahan tidak diketahui"}`;
   }
 
+  // === Pengambilan Data Event Dinonaktifkan Sementara ===
+  eventError = "Pengambilan data event dinonaktifkan sementara karena memerlukan parameter tambahan atau ada masalah API. Silakan periksa dokumentasi package.";
+  console.log("[getServerSideProps] Event fetching is temporarily disabled due to API error or missing parameters.");
+  /*
   try {
     if (jkt48Api && typeof jkt48Api.events === 'function') {
-      const eventDataResponse = await jkt48Api.events(apiKey);
-      console.log("[getServerSideProps] Raw eventDataResponse from API:", JSON.stringify(eventDataResponse, null, 2));
+      // Panggilan API event yang asli, mungkin memerlukan parameter tambahan:
+      // const eventDataResponse = await jkt48Api.events(apiKey); 
+      // Contoh jika butuh parameter (ini spekulatif, sesuaikan dengan dokumentasi):
+      // const eventDataResponse = await jkt48Api.events(apiKey, { limit: 5, status: 'upcoming' });
+
+      // Baris di bawah ini adalah placeholder jika Anda ingin menguji tanpa API call nyata
+      const eventDataResponse = null; // atau []
+      console.log("[getServerSideProps] Raw eventDataResponse from API (call disabled):", JSON.stringify(eventDataResponse, null, 2));
+
+
       if (eventDataResponse && Array.isArray(eventDataResponse)) {
         eventItems = eventDataResponse.slice(0, 4);
       } else if (eventDataResponse && eventDataResponse.events && Array.isArray(eventDataResponse.events)) {
          eventItems = eventDataResponse.events.slice(0, 4);
-      }
-       else {
+      } else if (eventDataResponse === null || (Array.isArray(eventDataResponse) && eventDataResponse.length === 0)) {
+        // Tidak melakukan apa-apa jika respons null atau array kosong, eventItems sudah []
+        console.log("[getServerSideProps] Event data is null or empty array (call disabled).");
+      } else {
         console.warn("[getServerSideProps] Event data is not in expected array format. Response:", eventDataResponse);
-        eventError = "Format data event tidak sesuai.";
+        eventError = "Format data event tidak sesuai (panggilan dinonaktifkan).";
       }
     } else {
       console.error("[getServerSideProps] 'jkt48Api.events' is not a function or jkt48Api is not defined.");
       eventError = "Metode event tidak tersedia.";
     }
   } catch (error) {
-    console.error("[getServerSideProps] Error fetching events:", error.message);
-    eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`;
+    console.error("[getServerSideProps] Error fetching events (call disabled):", error.message);
+    // eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`; 
+    // Pesan error sudah di set di atas
   }
+  */
+  // === Akhir Blok Pengambilan Data Event yang Dinonaktifkan ===
+
 
   console.log("[getServerSideProps] Returning props: newsError:", newsError, "newsItems count:", newsItems.length, "eventError:", eventError, "eventItems count:", eventItems.length);
 
@@ -67,8 +85,8 @@ export async function getServerSideProps() {
     props: {
       newsItems,
       newsError,
-      eventItems,
-      eventError,
+      eventItems, // akan menjadi array kosong
+      eventError, // akan berisi pesan bahwa pengambilan dinonaktifkan
     },
   };
 }
@@ -303,7 +321,7 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError 
                 ))}
               </div>
             ) : (
-              !eventError && <p className="text-center text-slate-500">Tidak ada event mendatang.</p>
+              !eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang.</p>
             )}
           </section>
           
