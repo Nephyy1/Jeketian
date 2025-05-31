@@ -185,51 +185,62 @@ export default function HomePage({ newsItems, newsError }) {
 
             {!newsError && newsItems && newsItems.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {newsItems.map((item) => (
-                  <div 
-                    key={item.id || item.title}
-                    className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"
-                  >
-                    <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">
-                          {item.title || "Judul tidak tersedia"}
-                        </h3>
-                        <p className="text-xs text-slate-500 mb-3 flex items-center">
-                          <FiCalendar className="mr-2 text-slate-400" />
-                          {formatDate(item.date)}
-                        </p>
-                        {item.label && (
-                          <div className="mt-2 flex items-center text-xs text-gray-500">
-                            <span className="mr-1.5">Kategori:</span>
-                            <Image
-                              src={`https://jkt48.com${item.label}`}
-                              alt="Ikon Kategori"
-                              width={16}
-                              height={16}
-                              className="inline-block object-contain"
-                              onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori dari jkt48.com untuk label: ${item.label}`); }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-4">
-                        {item.id ? (
-                          <Link href={`/news/${item.id}`} legacyBehavior>
-                            <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
-                              Baca Selengkapnya
-                              <FiExternalLink className="ml-2 h-4 w-4" />
-                            </a>
-                          </Link>
-                        ) : (
-                          <span className="inline-flex items-center text-sm text-gray-400 font-medium">
-                            (Detail tidak tersedia)
-                          </span>
-                        )}
+                {newsItems.map((item) => {
+                  let localIconPath = null;
+                  if (item.label) {
+                    const labelParts = item.label.split('/');
+                    const filename = labelParts.pop();
+                    if (filename) {
+                      localIconPath = `/img/${filename}`;
+                    }
+                  }
+
+                  return (
+                    <div 
+                      key={item.id || item.title}
+                      className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"
+                    >
+                      <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">
+                            {item.title || "Judul tidak tersedia"}
+                          </h3>
+                          <p className="text-xs text-slate-500 mb-3 flex items-center">
+                            <FiCalendar className="mr-2 text-slate-400" />
+                            {formatDate(item.date)}
+                          </p>
+                          {localIconPath && (
+                            <div className="mt-2 flex items-center text-xs text-gray-500">
+                              <span className="mr-1.5">Kategori:</span>
+                              <Image
+                                src={localIconPath}
+                                alt="Ikon Kategori"
+                                width={16}
+                                height={16}
+                                className="inline-block object-contain"
+                                onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal: ${localIconPath}`); }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-4">
+                          {item.id ? (
+                            <Link href={`/news/${item.id}`} legacyBehavior>
+                              <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
+                                Baca Selengkapnya
+                                <FiExternalLink className="ml-2 h-4 w-4" />
+                              </a>
+                            </Link>
+                          ) : (
+                            <span className="inline-flex items-center text-sm text-gray-400 font-medium">
+                              (Detail tidak tersedia)
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               !newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>
