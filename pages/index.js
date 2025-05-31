@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiArrowLeft } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiArrowLeft, FiFlame } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
@@ -172,11 +172,13 @@ export default function HomePage({ newsItems, newsError }) {
           </section>
 
           <section className="py-12 md:py-16">
-            <div className="flex items-center justify-center mb-10 md:mb-12">
-              <FiRss className="text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mr-3" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-amber-400">
-                Hot News JKT48
-              </h2>
+            <div className="flex flex-col items-center justify-center mb-10 md:mb-12">
+              <div className="flex items-center">
+                <FiFlame className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-3 drop-shadow-sm" />
+                <h2 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
+                  Hot News JKT48
+                </h2>
+              </div>
             </div>
 
             {newsError && (
