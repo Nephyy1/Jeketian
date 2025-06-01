@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, 
-    FiExternalLink, FiMapPin, FiHelpCircle, FiChevronDown, FiChevronUp 
+    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
+    FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp 
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 import { useState } from 'react';
@@ -323,9 +323,11 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
                     Jadwal Event Mendatang
                   </h2>
                 </div>
+
                 {eventError && (
                   <p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{eventError}</p>
                 )}
+
                 {!eventError && eventItems && eventItems.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                     {eventItems.map((event) => {
@@ -387,8 +389,7 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
-                    <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-3px' }}>
-                        <FiHelpCircle className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
+                    <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
                         Pertanyaan Umum (FAQ)
                     </h2>
                 </div>
