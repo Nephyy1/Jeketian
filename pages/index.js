@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
+    FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, 
     FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
@@ -85,11 +85,10 @@ export async function getServerSideProps() {
         const birthdayDataResponse = await jkt48Api.birthday(apiKey);
         console.log("[getServerSideProps] Raw birthdayDataResponse from API (should be an array):", JSON.stringify(birthdayDataResponse, null, 2));
         if (birthdayDataResponse && Array.isArray(birthdayDataResponse)) {
-            // API sekarang mengembalikan data yang benar, kita bisa slice jika perlu
-            birthdayItems = birthdayDataResponse.slice(0, 4); // Menampilkan hingga 4 member
+            birthdayItems = birthdayDataResponse.slice(0, 5);
         } else {
           console.warn("[getServerSideProps] Birthday data is not in expected array format. Response:", birthdayDataResponse);
-          birthdayError = "Format data ulang tahun tidak sesuai atau API ulang tahun bermasalah.";
+          birthdayError = "Format data ulang tahun tidak sesuai.";
         }
       } else {
         console.error("[getServerSideProps] 'jkt48Api.birthday' is not a function or jkt48Api is not defined.");
@@ -146,14 +145,13 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
     if (!dateString) return "Tanggal tidak tersedia";
     let options = { year: 'numeric', month: 'long', day: 'numeric' };
     if (onlyMonthDay) {
-        options = { month: 'long', day: 'numeric' }; // Hanya bulan dan tanggal
+        options = { month: 'long', day: 'numeric' };
     }
-    if (includeTime && !onlyMonthDay) { // Hanya sertakan waktu jika tidak onlyMonthDay
+    if (includeTime && !onlyMonthDay) {
       options.hour = '2-digit';
       options.minute = '2-digit';
       options.hour12 = false;
     }
-    // Semua tanggal dari API sudah UTC (Z), jadi konversi ke WIB untuk konsistensi
     options.timeZone = 'Asia/Jakarta'; 
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
@@ -324,30 +322,29 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
                 </div>
                 {birthdayError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{birthdayError}</p>)}
                 {!birthdayError && birthdayItems && birthdayItems.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+                  <div className="max-w-2xl mx-auto space-y-3">
                     {birthdayItems.map((member) => (
                       <div 
                         key={member.url_key || member.name} 
-                        className="bg-white rounded-xl shadow-lg group transform hover:-translate-y-1 transition-all duration-300 overflow-hidden text-center p-0.5 bg-gradient-to-br from-pink-400 via-purple-500 to-orange-400"
+                        className="flex items-center p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-transparent hover:border-pink-300"
                       >
-                        <div className="bg-white rounded-[10px] p-5 h-full flex flex-col items-center justify-center">
-                          {member.img && (
-                            <div className="relative w-28 h-28 sm:w-32 sm:h-32 mb-4">
-                                <Image 
-                                    src={member.img} 
-                                    alt={member.name || "Foto member"} 
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="rounded-full border-4 border-white shadow-md group-hover:border-pink-300 transition-colors"
-                                    onError={(e) => { e.target.style.display='none'; console.warn(`Gagal memuat gambar member: ${member.img}`);}}
-                                />
-                            </div>
-                          )}
-                          <h4 className="font-bold text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200 truncate w-full px-2">
+                        {member.img && (
+                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4 flex-shrink-0">
+                            <Image 
+                                src={member.img} 
+                                alt={member.name || "Foto member"} 
+                                layout="fill"
+                                objectFit="cover"
+                                className="rounded-full border-2 border-slate-200 group-hover:border-pink-400 transition-colors duration-300"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-grow">
+                          <h4 className="font-bold text-md sm:text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200">
                             {member.name || "Nama Member"}
                           </h4>
-                          <div className="flex items-center justify-center text-sm text-slate-600 mt-1 group-hover:text-purple-600 transition-colors duration-200">
-                            <FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200" />
+                          <div className="flex items-center text-sm text-slate-500 mt-1 group-hover:text-purple-600 transition-colors duration-200">
+                            <FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200 flex-shrink-0" />
                             <span>{formatDate(member.birthdate, false, true)}</span>
                           </div>
                         </div>
