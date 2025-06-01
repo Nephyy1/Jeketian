@@ -4,8 +4,9 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, 
-    FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift
+    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
+    FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
+    FiHelpCircle
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 import { useState } from 'react';
@@ -118,24 +119,32 @@ export async function getServerSideProps() {
 
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="border-b border-slate-200 last:border-b-0">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-4 overflow-hidden border border-slate-200">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center w-full py-5 px-1 text-left text-slate-700 hover:text-pink-600 focus:outline-none transition-colors duration-200"
+        className={`w-full p-5 sm:p-6 text-left flex justify-between items-center focus:outline-none transition-all duration-300 ease-in-out group ${isOpen ? 'bg-pink-50 text-pink-700' : 'text-slate-800 hover:bg-slate-50'}`}
       >
-        <span className="text-base sm:text-lg font-medium">{question}</span>
+        <div className="flex items-center">
+          <FiHelpCircle className={`mr-3 h-6 w-6 flex-shrink-0 transition-colors duration-300 ${isOpen ? 'text-pink-600' : 'text-pink-500 group-hover:text-pink-600'}`} />
+          <span className="text-base sm:text-lg font-semibold">
+            {question}
+          </span>
+        </div>
         {isOpen ? (
-          <FiChevronUp className="h-5 w-5 text-pink-500 flex-shrink-0" />
+          <FiChevronUp className="h-6 w-6 text-pink-600 flex-shrink-0 transform transition-transform duration-300" />
         ) : (
-          <FiChevronDown className="h-5 w-5 text-slate-400 group-hover:text-pink-500 flex-shrink-0" />
+          <FiChevronDown className="h-6 w-6 text-slate-500 group-hover:text-pink-500 flex-shrink-0 transform transition-transform duration-300" />
         )}
       </button>
-      {isOpen && (
-        <div className="pb-5 px-1 text-slate-600 text-sm sm:text-base leading-relaxed">
+      <div 
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px]' : 'max-h-0'}`}
+      >
+        <div className="px-6 sm:px-7 pb-5 pt-3 text-slate-600 text-sm sm:text-base leading-relaxed border-t border-slate-100">
           {answer}
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -316,51 +325,11 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
-                    Ulang Tahun Member Mendatang
-                  </h2>
-                </div>
-                {birthdayError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{birthdayError}</p>)}
-                {!birthdayError && birthdayItems && birthdayItems.length > 0 ? (
-                  <div className="max-w-2xl mx-auto space-y-3">
-                    {birthdayItems.map((member) => (
-                      <div 
-                        key={member.url_key || member.name} 
-                        className="flex items-center p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-transparent hover:border-pink-300"
-                      >
-                        {member.img && (
-                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4 flex-shrink-0">
-                            <Image 
-                                src={member.img} 
-                                alt={member.name || "Foto member"} 
-                                layout="fill"
-                                objectFit="cover"
-                                className="rounded-full border-2 border-slate-200 group-hover:border-pink-400 transition-colors duration-300"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-grow">
-                          <h4 className="font-bold text-md sm:text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200">
-                            {member.name || "Nama Member"}
-                          </h4>
-                          <div className="flex items-center text-sm text-slate-500 mt-1 group-hover:text-purple-600 transition-colors duration-200">
-                            <FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200 flex-shrink-0" />
-                            <span>{formatDate(member.birthdate, false, true)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (!birthdayError && birthdayItems.length === 0 && <p className="text-center text-slate-500">Tidak ada member yang berulang tahun dalam waktu dekat.</p>)}
-              </section>
-
-              <section className="py-12 md:py-16">
-                <div className="text-center mb-10 md:mb-12">
                     <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
                         Pertanyaan Umum (FAQ)
                     </h2>
                 </div>
-                <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-xl divide-y divide-slate-200">
+                <div className="max-w-3xl mx-auto space-y-0">
                     {faqData.map((faq) => (
                         <FAQItem key={faq.id} question={faq.question} answer={faq.answer} />
                     ))}
