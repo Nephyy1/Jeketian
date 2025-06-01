@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, FiExternalLink, FiMapPin } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiCalendar, FiInfo, FiExternalLink, FiRss, FiMapPin } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export async function getServerSideProps() {
@@ -287,8 +287,7 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 drop-shadow-sm relative" style={{ left: '-3px' }}>
-                    <FiCalendar className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
+                  <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-3px' }}>
                     Jadwal Event Mendatang
                   </h2>
                 </div>
