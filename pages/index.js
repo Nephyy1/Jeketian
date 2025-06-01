@@ -3,8 +3,12 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
-import { FiFilm, FiUsers, FiCalendar, FiInfo, FiExternalLink, FiRss, FiMapPin } from 'react-icons/fi';
+import { 
+    FiFilm, FiUsers, FiZap, FiCalendar, FiInfo, FiRss, 
+    FiExternalLink, FiMapPin, FiHelpCircle, FiChevronDown, FiChevronUp 
+} from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
+import { useState } from 'react';
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -44,52 +48,37 @@ export async function getServerSideProps() {
     try {
       if (jkt48Api && typeof jkt48Api.news === 'function') {
         const newsDataResponse = await jkt48Api.news(apiKey);
-        console.log("[getServerSideProps] Raw newsDataResponse from API:", JSON.stringify(newsDataResponse, null, 2));
         if (newsDataResponse && newsDataResponse.news && Array.isArray(newsDataResponse.news)) {
           newsItems = newsDataResponse.news.slice(0, 6);
         } else {
-          console.warn("[getServerSideProps] News data is not in expected format or missing 'news' array. Response:", newsDataResponse);
           newsError = "Format data berita tidak sesuai.";
         }
       } else {
-        console.error("[getServerSideProps] 'jkt48Api.news' is not a function or jkt48Api is not defined.");
         newsError = "Metode berita tidak tersedia.";
       }
     } catch (error) {
-      console.error("[getServerSideProps] Error fetching news:", error.message);
       newsError = `Gagal memuat berita: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
     try {
       if (jkt48Api && typeof jkt48Api.events === 'function') {
-        console.log("[getServerSideProps] Attempting to fetch events...");
         const eventDataResponse = await jkt48Api.events(apiKey);
-        console.log("[getServerSideProps] Raw eventDataResponse from API (should be an array):", JSON.stringify(eventDataResponse, null, 2));
-        
         if (eventDataResponse && Array.isArray(eventDataResponse)) {
           eventItems = eventDataResponse.slice(0, 4);
         } else if (eventDataResponse && eventDataResponse.events && Array.isArray(eventDataResponse.events)) {
            eventItems = eventDataResponse.events.slice(0, 4);
         } else {
-          console.warn("[getServerSideProps] Event data is not in expected array format. Response:", eventDataResponse);
           eventError = "Format data event tidak sesuai atau API event bermasalah.";
-          eventItems = [];
         }
       } else {
-        console.error("[getServerSideProps] 'jkt48Api.events' is not a function or jkt48Api is not defined.");
         eventError = "Metode event tidak tersedia.";
-        eventItems = [];
       }
     } catch (error) {
-      console.error("[getServerSideProps] Error fetching events:", error.message);
       eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`;
-      eventItems = [];
     }
   } else {
      console.log("[getServerSideProps] API Key validation failed. Skipping news and event fetching.");
   }
-
-  console.log("[getServerSideProps] Returning props: apiKeyError:", apiKeyError, "newsError:", newsError, "newsItems count:", newsItems.length, "eventError:", eventError, "eventItems count:", eventItems.length);
 
   return {
     props: {
@@ -101,6 +90,31 @@ export async function getServerSideProps() {
     },
   };
 }
+
+const FAQItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-slate-200 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex justify-between items-center w-full py-5 px-1 text-left text-slate-700 hover:text-pink-600 focus:outline-none transition-colors duration-200"
+      >
+        <span className="text-base sm:text-lg font-medium">{question}</span>
+        {isOpen ? (
+          <FiChevronUp className="h-5 w-5 text-pink-500 flex-shrink-0" />
+        ) : (
+          <FiChevronDown className="h-5 w-5 text-slate-400 group-hover:text-pink-500 flex-shrink-0" />
+        )}
+      </button>
+      {isOpen && (
+        <div className="pb-5 px-1 text-slate-600 text-sm sm:text-base leading-relaxed">
+          {answer}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function HomePage({ newsItems, newsError, eventItems, eventError, apiKeyError }) {
   const formatDate = (dateString, includeTime = false) => {
@@ -114,6 +128,24 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
     }
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
+
+  const faqData = [
+    {
+      id: 1,
+      question: "Apa Itu JKT48?",
+      answer: "JKT48 adalah sebuah idol group asal Indonesia dan merupakan sister group pertama dari AKB48 (Jepang) di luar Jepang. Berbasis di Jakarta, JKT48 mengusung konsep \"Idol yang Dapat Kamu Temui Setiap Hari\" melalui pertunjukan rutin di teater mereka.",
+    },
+    {
+      id: 2,
+      question: "Di Mana Lokasi Teater JKT48?",
+      answer: "Teater JKT48 berlokasi di fX Sudirman Mall, Lantai 4, Jalan Jenderal Sudirman, Pintu Satu Senayan, Jakarta Pusat. Ini adalah tempat di mana JKT48 mengadakan pertunjukan reguler mereka.",
+    },
+    {
+      id: 3,
+      question: "Bagaimana Cara Menonton Pertunjukan Teater JKT48?",
+      answer: "Untuk menonton pertunjukan teater, Anda umumnya perlu membeli tiket melalui sistem ticketing resmi JKT48 yang diumumkan di website atau media sosial resmi JKT48. Perhatikan pengumuman jadwal show dan tata cara pembelian tiket karena seringkali ada sistem undian (lottery) atau penjualan terbatas, terutama untuk show populer.",
+    },
+  ];
 
   return (
     <>
@@ -291,23 +323,20 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
                     Jadwal Event Mendatang
                   </h2>
                 </div>
-
                 {eventError && (
                   <p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{eventError}</p>
                 )}
-
                 {!eventError && eventItems && eventItems.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                     {eventItems.map((event) => {
                       let localEventIconPath = null;
-                      if (event.label) {
+                      if (event.label && typeof event.label === 'string') {
                         const labelUrlParts = event.label.split('/');
                         const eventLabelFilename = labelUrlParts.pop();
                         if (eventLabelFilename) {
                             localEventIconPath = `/img/${eventLabelFilename}`;
                         }
                       }
-
                       return (
                         <div 
                           key={event.id}
@@ -354,6 +383,20 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
                 ) : (
                   !eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>
                 )}
+              </section>
+
+              <section className="py-12 md:py-16">
+                <div className="text-center mb-10 md:mb-12">
+                    <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-3px' }}>
+                        <FiHelpCircle className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
+                        Pertanyaan Umum (FAQ)
+                    </h2>
+                </div>
+                <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-xl p-1 sm:p-2">
+                    {faqData.map((faq) => (
+                        <FAQItem key={faq.id} question={faq.question} answer={faq.answer} />
+                    ))}
+                </div>
               </section>
               
             </div>
