@@ -4,21 +4,37 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
+    FiFilm, FiUsers, FiCalendar, FiInfo, 
     FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
-    FiHelpCircle, FiYoutube, FiPlayCircle // Menambahkan FiYoutube dan FiPlayCircle
+    FiHelpCircle, FiYoutube, FiPlayCircle
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 import { useState } from 'react';
 
-// Import Swiper React components and modules
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, A11y } from 'swiper/modules';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+
+const GlobalSwiperStyles = () => (
+  <style jsx global>{`
+    .swiper-button-prev,
+    .swiper-button-next {
+      color: transparent !important;
+      background-image: none !important;
+      background-color: transparent !important;
+      width: 2.75rem !important;
+      height: 2.75rem !important;
+    }
+    .swiper-button-prev::after,
+    .swiper-button-next::after {
+        content: '' !important;
+    }
+  `}</style>
+);
+
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -30,8 +46,8 @@ export async function getServerSideProps() {
   let eventError = null;
   let birthdayItems = [];
   let birthdayError = null;
-  let youtubeItems = []; // Variabel untuk data YouTube
-  let youtubeError = null; // Variabel untuk error YouTube
+  let youtubeItems = []; 
+  let youtubeError = null; 
   let apiKeyError = null;
 
   console.log("[getServerSideProps] API Key being used:", apiKey);
@@ -59,7 +75,6 @@ export async function getServerSideProps() {
 
   if (!apiKeyError) {
     console.log("[getServerSideProps] API Key valid, proceeding to fetch data.");
-    // Fetch News
     try {
       if (jkt48Api && typeof jkt48Api.news === 'function') {
         const newsDataResponse = await jkt48Api.news(apiKey);
@@ -75,7 +90,6 @@ export async function getServerSideProps() {
       newsError = `Gagal memuat berita: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
-    // Fetch Events
     try {
       if (jkt48Api && typeof jkt48Api.events === 'function') {
         const eventDataResponse = await jkt48Api.events(apiKey);
@@ -93,7 +107,6 @@ export async function getServerSideProps() {
       eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
-    // Fetch Birthdays
     try {
       if (jkt48Api && typeof jkt48Api.birthday === 'function') {
         console.log("[getServerSideProps] Attempting to fetch birthdays...");
@@ -114,18 +127,17 @@ export async function getServerSideProps() {
       birthdayError = `Gagal memuat data ulang tahun: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
-    // Fetch YouTube Videos
     try {
       if (jkt48Api && typeof jkt48Api.youtube === 'function') {
         console.log("[getServerSideProps] Attempting to fetch YouTube videos...");
         const youtubeDataResponse = await jkt48Api.youtube(apiKey);
         console.log("[getServerSideProps] Raw youtubeDataResponse from API:", JSON.stringify(youtubeDataResponse, null, 2));
-        // Asumsi API mengembalikan array langsung atau objek dengan properti 'videos'
         if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-            youtubeItems = youtubeDataResponse.slice(0, 8); // Ambil hingga 8 video
+            youtubeItems = youtubeDataResponse.slice(0, 8);
         } else if (youtubeDataResponse && youtubeDataResponse.videos && Array.isArray(youtubeDataResponse.videos)) {
             youtubeItems = youtubeDataResponse.videos.slice(0, 8);
-        } else {
+        }
+         else {
           console.warn("[getServerSideProps] YouTube data is not in expected array format. Response:", youtubeDataResponse);
           youtubeError = "Format data YouTube tidak sesuai.";
         }
@@ -147,7 +159,7 @@ export async function getServerSideProps() {
       newsItems, newsError,
       eventItems, eventError,
       birthdayItems, birthdayError,
-      youtubeItems, youtubeError, // Menambahkan props YouTube
+      youtubeItems, youtubeError,
       apiKeyError,
     },
   };
@@ -189,7 +201,7 @@ export default function HomePage({
   newsItems, newsError, 
   eventItems, eventError, 
   birthdayItems, birthdayError, 
-  youtubeItems, youtubeError, // Menambahkan props YouTube
+  youtubeItems, youtubeError,
   apiKeyError 
 }) {
   const formatDate = (dateString, includeTime = false, onlyMonthDay = false) => {
@@ -215,6 +227,7 @@ export default function HomePage({
 
   return (
     <>
+      <GlobalSwiperStyles />
       <Head>
         <title>Jeketian - JKT48 Fan Hub</title>
         <meta name="description" content="Website fan-made JKT48 yang didedikasikan untuk fans JKT48." />
@@ -306,7 +319,6 @@ export default function HomePage({
                 {!birthdayError && birthdayItems && birthdayItems.length > 0 ? (<div className="max-w-2xl mx-auto space-y-4">{birthdayItems.map((member) => (<div key={member.url_key || member.name} className="flex items-center p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-transparent hover:border-pink-300">{member.img && (<div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4 flex-shrink-0"><Image src={member.img} alt={member.name || "Foto member"} layout="fill" objectFit="cover" className="rounded-full border-2 border-slate-200 group-hover:border-pink-400 transition-colors duration-300"/></div>)}<div className="flex-grow"><h4 className="font-bold text-md sm:text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200">{member.name || "Nama Member"}</h4><div className="flex items-center text-sm text-slate-500 mt-1 group-hover:text-purple-600 transition-colors duration-200"><FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200 flex-shrink-0" /><span>{formatDate(member.birthdate, false, true)}</span></div></div></div>))}</div>) : (!birthdayError && birthdayItems.length === 0 && <p className="text-center text-slate-500">Tidak ada member yang berulang tahun dalam waktu dekat.</p>)}
               </section>
 
-              {/* SECTION YOUTUBE BARU DIMULAI DI SINI */}
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
                     <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
@@ -329,19 +341,24 @@ export default function HomePage({
                             1024: { slidesPerView: 3.5, spaceBetween: 30 },
                             1280: { slidesPerView: 4.2, spaceBetween: 30 },
                         }}
-                        className="py-4 px-2" // Padding agar navigasi/paginasi tidak terpotong
+                        className="py-4 px-2 relative"
                     >
                         {youtubeItems.map((video) => (
-                            <SwiperSlide key={video.id || video.title} className="h-auto pb-8"> {/* pb-8 untuk ruang paginasi */}
-                                <a href={video.url || '#'} target="_blank" rel="noopener noreferrer" className="block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden group bg-white">
-                                    <div className="relative aspect-video bg-slate-200"> {/* aspect-video untuk rasio 16:9 */}
+                            <SwiperSlide key={video.videoId || video.title} className="h-auto pb-8"> 
+                                <a href={video.videoUrl || '#'} target="_blank" rel="noopener noreferrer" className="block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden group bg-white">
+                                    <div className="relative aspect-video bg-slate-200">
                                         {video.thumbnail ? (
                                             <Image 
                                                 src={video.thumbnail} 
                                                 alt={video.title || "Video thumbnail"} 
                                                 layout="fill" 
                                                 objectFit="cover" 
-                                                onError={(e) => { e.target.style.display='none'; console.warn(`Gagal memuat thumbnail YouTube: ${video.thumbnail}`);}}
+                                                onError={(e) => { 
+                                                    const target = e.target; 
+                                                    if (target.parentElement) target.parentElement.style.backgroundColor = '#e2e8f0';
+                                                    target.style.display='none'; 
+                                                    console.warn(`Gagal memuat thumbnail YouTube: ${video.thumbnail}`);
+                                                }}
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center"><FiYoutube className="text-slate-400 w-12 h-12" /></div>
@@ -354,8 +371,8 @@ export default function HomePage({
                                         <h4 className="font-semibold text-sm sm:text-base text-slate-800 group-hover:text-pink-600 transition-colors duration-200 line-clamp-2" title={video.title || "Judul Video"}>
                                             {video.title || "Judul Video"}
                                         </h4>
-                                        {video.channelTitle && ( // Tampilkan channel title jika ada
-                                            <p className="text-xs text-slate-500 mt-1">{video.channelTitle}</p>
+                                        {video.channelName && ( 
+                                            <p className="text-xs text-slate-500 mt-1">{video.channelName}</p>
                                         )}
                                     </div>
                                 </a>
@@ -364,7 +381,6 @@ export default function HomePage({
                     </Swiper>
                 ) : (!youtubeError && youtubeItems.length === 0 && <p className="text-center text-slate-500">Tidak ada video YouTube untuk ditampilkan.</p>)}
               </section>
-              {/* SECTION YOUTUBE BARU BERAKHIR DI SINI */}
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
