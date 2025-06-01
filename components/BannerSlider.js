@@ -8,7 +8,7 @@ import 'swiper/css/pagination';
 
 const banners = [
   { id: 1, src: '/banners/banner.home.tokopedia.jpg', alt: 'Tokopedia Banner' },
-  { id: 2, src: '/banners/banner.home.allintour.jpg', alt: 'Allintour Banner' },
+  { id: 2, src: '/banners/banner.home.allintour.png', alt: 'Allintour Banner' },
   { id: 3, src: '/banners/banner.home.jtrust.webp', alt: 'JTrust Bank Banner' },
   { id: 4, src: '/banners/banner.home.valkyrie48.jpg', alt: 'Valkyrie48 Banner' },
   { id: 5, src: '/banners/banner.home.jkt48v.jpg', alt: 'JKT48V Banner' },
