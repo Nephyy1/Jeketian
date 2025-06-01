@@ -6,10 +6,19 @@ import Image from 'next/image';
 import { 
     FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
     FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
-    FiHelpCircle
+    FiHelpCircle, FiYoutube, FiPlayCircle // Menambahkan FiYoutube dan FiPlayCircle
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 import { useState } from 'react';
+
+// Import Swiper React components and modules
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, A11y } from 'swiper/modules';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -21,6 +30,8 @@ export async function getServerSideProps() {
   let eventError = null;
   let birthdayItems = [];
   let birthdayError = null;
+  let youtubeItems = []; // Variabel untuk data YouTube
+  let youtubeError = null; // Variabel untuk error YouTube
   let apiKeyError = null;
 
   console.log("[getServerSideProps] API Key being used:", apiKey);
@@ -48,6 +59,7 @@ export async function getServerSideProps() {
 
   if (!apiKeyError) {
     console.log("[getServerSideProps] API Key valid, proceeding to fetch data.");
+    // Fetch News
     try {
       if (jkt48Api && typeof jkt48Api.news === 'function') {
         const newsDataResponse = await jkt48Api.news(apiKey);
@@ -63,6 +75,7 @@ export async function getServerSideProps() {
       newsError = `Gagal memuat berita: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
+    // Fetch Events
     try {
       if (jkt48Api && typeof jkt48Api.events === 'function') {
         const eventDataResponse = await jkt48Api.events(apiKey);
@@ -80,6 +93,7 @@ export async function getServerSideProps() {
       eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
+    // Fetch Birthdays
     try {
       if (jkt48Api && typeof jkt48Api.birthday === 'function') {
         console.log("[getServerSideProps] Attempting to fetch birthdays...");
@@ -100,18 +114,40 @@ export async function getServerSideProps() {
       birthdayError = `Gagal memuat data ulang tahun: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
+    // Fetch YouTube Videos
+    try {
+      if (jkt48Api && typeof jkt48Api.youtube === 'function') {
+        console.log("[getServerSideProps] Attempting to fetch YouTube videos...");
+        const youtubeDataResponse = await jkt48Api.youtube(apiKey);
+        console.log("[getServerSideProps] Raw youtubeDataResponse from API:", JSON.stringify(youtubeDataResponse, null, 2));
+        // Asumsi API mengembalikan array langsung atau objek dengan properti 'videos'
+        if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
+            youtubeItems = youtubeDataResponse.slice(0, 8); // Ambil hingga 8 video
+        } else if (youtubeDataResponse && youtubeDataResponse.videos && Array.isArray(youtubeDataResponse.videos)) {
+            youtubeItems = youtubeDataResponse.videos.slice(0, 8);
+        } else {
+          console.warn("[getServerSideProps] YouTube data is not in expected array format. Response:", youtubeDataResponse);
+          youtubeError = "Format data YouTube tidak sesuai.";
+        }
+      } else {
+        console.error("[getServerSideProps] 'jkt48Api.youtube' is not a function or jkt48Api is not defined.");
+        youtubeError = "Metode YouTube tidak tersedia.";
+      }
+    } catch (error) {
+      console.error("[getServerSideProps] Error fetching YouTube videos:", error.message);
+      youtubeError = `Gagal memuat video YouTube: ${error.message || "Kesalahan tidak diketahui"}`;
+    }
+
   } else {
      console.log("[getServerSideProps] API Key validation failed. Skipping data fetching.");
   }
 
   return {
     props: {
-      newsItems,
-      newsError,
-      eventItems,
-      eventError,
-      birthdayItems,
-      birthdayError,
+      newsItems, newsError,
+      eventItems, eventError,
+      birthdayItems, birthdayError,
+      youtubeItems, youtubeError, // Menambahkan props YouTube
       apiKeyError,
     },
   };
@@ -149,7 +185,13 @@ const FAQItem = ({ question, answer }) => {
   );
 };
 
-export default function HomePage({ newsItems, newsError, eventItems, eventError, birthdayItems, birthdayError, apiKeyError }) {
+export default function HomePage({ 
+  newsItems, newsError, 
+  eventItems, eventError, 
+  birthdayItems, birthdayError, 
+  youtubeItems, youtubeError, // Menambahkan props YouTube
+  apiKeyError 
+}) {
   const formatDate = (dateString, includeTime = false, onlyMonthDay = false) => {
     if (!dateString) return "Tanggal tidak tersedia";
     let options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -247,121 +289,82 @@ export default function HomePage({ newsItems, newsError, eventItems, eventError,
               </section>
 
               <section className="py-12 md:py-16">
-                <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">Hot News JKT48</h2>
-                </div>
+                <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">Hot News JKT48</h2></div>
                 {newsError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{newsError}</p>)}
-                {!newsError && newsItems && newsItems.length > 0 ? (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    {newsItems.map((item) => {
-                      let localIconPath = null;
-                      if (item.label) {
-                        const labelParts = item.label.split('/');
-                        const filename = labelParts.pop();
-                        if (filename) { localIconPath = `/img/${filename}`; }
-                      }
-                      return (
-                        <div key={item.id || item.title} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
-                          <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
-                            <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">{item.title || "Judul tidak tersedia"}</h3>
-                              <p className="text-xs text-slate-500 mb-3 flex items-center"><FiCalendar className="mr-2 text-slate-400" />{formatDate(item.date)}</p>
-                              {localIconPath && (
-                                <div className="mt-2 flex items-center text-xs text-gray-500">
-                                  <span className="mr-1.5">Kategori:</span>
-                                  <Image src={localIconPath} alt="Ikon Kategori Berita" width={40} height={40} className="inline-block object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal BERITA: ${localIconPath}`); }}/>
-                                </div>
-                              )}
-                            </div>
-                            <div className="mt-4">
-                              {item.id ? (
-                                <Link href={`/news/${item.id}`} legacyBehavior>
-                                  <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">Baca Selengkapnya<FiExternalLink className="ml-2 h-4 w-4" /></a>
-                                </Link>
-                              ) : (<span className="inline-flex items-center text-sm text-gray-400 font-medium">(Detail tidak tersedia)</span>)}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (!newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>)}
+                {!newsError && newsItems && newsItems.length > 0 ? (<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{newsItems.map((item) => {let localIconPath = null; if (item.label) {const labelParts = item.label.split('/'); const filename = labelParts.pop(); if (filename) { localIconPath = `/img/${filename}`; }} return (<div key={item.id || item.title} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"><div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between"><div><h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">{item.title || "Judul tidak tersedia"}</h3><p className="text-xs text-slate-500 mb-3 flex items-center"><FiCalendar className="mr-2 text-slate-400" />{formatDate(item.date)}</p>{localIconPath && (<div className="mt-2 flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori:</span><Image src={localIconPath} alt="Ikon Kategori Berita" width={40} height={40} className="inline-block object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal BERITA: ${localIconPath}`); }}/></div>)}</div><div className="mt-4">{item.id ? (<Link href={`/news/${item.id}`} legacyBehavior><a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">Baca Selengkapnya<FiExternalLink className="ml-2 h-4 w-4" /></a></Link>) : (<span className="inline-flex items-center text-sm text-gray-400 font-medium">(Detail tidak tersedia)</span>)}</div></div></div>);})}</div>) : (!newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>)}
               </section>
 
               <section className="py-12 md:py-16">
-                <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>Jadwal Event Mendatang</h2>
-                </div>
+                <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>Jadwal Event Mendatang</h2></div>
                 {eventError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{eventError}</p>)}
-                {!eventError && eventItems && eventItems.length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-                    {eventItems.map((event) => {
-                      let localEventIconPath = null;
-                      if (event.label && typeof event.label === 'string') {
-                        const labelUrlParts = event.label.split('/');
-                        const eventLabelFilename = labelUrlParts.pop();
-                        if (eventLabelFilename) { localEventIconPath = `/img/${eventLabelFilename}`; }
-                      }
-                      return (
-                        <div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden">
-                          <div className="h-2 bg-gradient-to-r from-pink-500 via-red-500 to-orange-400"></div>
-                          <div className="p-5 space-y-3">
-                            <h3 className="text-lg font-semibold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight truncate">{event.title || "Nama Event Tidak Tersedia"}</h3>
-                            <div className="flex items-center text-sm text-slate-500"><FiCalendar className="mr-2 text-pink-500 flex-shrink-0" /><span>{formatDate(event.date, true)}</span></div>
-                            {localEventIconPath && (
-                              <div className="flex items-center text-xs text-gray-500">
-                                <span className="mr-1.5">Kategori Event:</span>
-                                <Image src={localEventIconPath} alt="Ikon Kategori Event" width={40} height={40} className="mr-1.5 object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori EVENT lokal: ${localEventIconPath}`); }}/>
-                              </div>
-                            )}
-                            {event.url && (<a href={event.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm text-pink-600 hover:text-purple-700 font-medium transition-colors duration-300 mt-2 group/link">Lihat Detail Event<FiExternalLink className="ml-1.5 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" /></a>)}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (!eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>)}
+                {!eventError && eventItems && eventItems.length > 0 ? (<div className="grid md:grid-cols-2 gap-6 md:gap-8">{eventItems.map((event) => {let localEventIconPath = null; if (event.label && typeof event.label === 'string') {const labelUrlParts = event.label.split('/'); const eventLabelFilename = labelUrlParts.pop(); if (eventLabelFilename) { localEventIconPath = `/img/${eventLabelFilename}`; }} return (<div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden"><div className="h-2 bg-gradient-to-r from-pink-500 via-red-500 to-orange-400"></div><div className="p-5 space-y-3"><h3 className="text-lg font-semibold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight truncate">{event.title || "Nama Event Tidak Tersedia"}</h3><div className="flex items-center text-sm text-slate-500"><FiCalendar className="mr-2 text-pink-500 flex-shrink-0" /><span>{formatDate(event.date, true)}</span></div>{localEventIconPath && (<div className="flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori Event:</span><Image src={localEventIconPath} alt="Ikon Kategori Event" width={40} height={40} className="mr-1.5 object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori EVENT lokal: ${localEventIconPath}`); }}/></div>)}{event.url && (<a href={event.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm text-pink-600 hover:text-purple-700 font-medium transition-colors duration-300 mt-2 group/link">Lihat Detail Event<FiExternalLink className="ml-1.5 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" /></a>)}</div></div>);})}</div>) : (!eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>)}
               </section>
 
               <section className="py-12 md:py-16">
-                <div className="text-center mb-10 md:mb-12">
-                  <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
-                    Ulang Tahun Member Mendatang
-                  </h2>
-                </div>
+                <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>Ulang Tahun Member Mendatang</h2></div>
                 {birthdayError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{birthdayError}</p>)}
-                {!birthdayError && birthdayItems && birthdayItems.length > 0 ? (
-                  <div className="max-w-2xl mx-auto space-y-4">
-                    {birthdayItems.map((member) => (
-                      <div 
-                        key={member.url_key || member.name} 
-                        className="flex items-center p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-transparent hover:border-pink-300"
-                      >
-                        {member.img && (
-                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4 flex-shrink-0">
-                            <Image 
-                                src={member.img} 
-                                alt={member.name || "Foto member"} 
-                                layout="fill"
-                                objectFit="cover"
-                                className="rounded-full border-2 border-slate-200 group-hover:border-pink-400 transition-colors duration-300"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-grow">
-                          <h4 className="font-bold text-md sm:text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200">
-                            {member.name || "Nama Member"}
-                          </h4>
-                          <div className="flex items-center text-sm text-slate-500 mt-1 group-hover:text-purple-600 transition-colors duration-200">
-                            <FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200 flex-shrink-0" />
-                            <span>{formatDate(member.birthdate, false, true)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (!birthdayError && birthdayItems.length === 0 && <p className="text-center text-slate-500">Tidak ada member yang berulang tahun dalam waktu dekat.</p>)}
+                {!birthdayError && birthdayItems && birthdayItems.length > 0 ? (<div className="max-w-2xl mx-auto space-y-4">{birthdayItems.map((member) => (<div key={member.url_key || member.name} className="flex items-center p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-transparent hover:border-pink-300">{member.img && (<div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4 flex-shrink-0"><Image src={member.img} alt={member.name || "Foto member"} layout="fill" objectFit="cover" className="rounded-full border-2 border-slate-200 group-hover:border-pink-400 transition-colors duration-300"/></div>)}<div className="flex-grow"><h4 className="font-bold text-md sm:text-lg text-slate-800 group-hover:text-pink-600 transition-colors duration-200">{member.name || "Nama Member"}</h4><div className="flex items-center text-sm text-slate-500 mt-1 group-hover:text-purple-600 transition-colors duration-200"><FiGift className="mr-2 text-pink-500 group-hover:text-purple-500 transition-colors duration-200 flex-shrink-0" /><span>{formatDate(member.birthdate, false, true)}</span></div></div></div>))}</div>) : (!birthdayError && birthdayItems.length === 0 && <p className="text-center text-slate-500">Tidak ada member yang berulang tahun dalam waktu dekat.</p>)}
               </section>
+
+              {/* SECTION YOUTUBE BARU DIMULAI DI SINI */}
+              <section className="py-12 md:py-16">
+                <div className="text-center mb-10 md:mb-12">
+                    <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
+                        <FiYoutube className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
+                        JKT48 di YouTube
+                    </h2>
+                </div>
+                {youtubeError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{youtubeError}</p>)}
+                {!youtubeError && youtubeItems && youtubeItems.length > 0 ? (
+                    <Swiper
+                        modules={[Navigation, Pagination, A11y]}
+                        spaceBetween={16}
+                        slidesPerView={1.3}
+                        navigation
+                        pagination={{ clickable: true, dynamicBullets: true }}
+                        grabCursor={true}
+                        breakpoints={{
+                            640: { slidesPerView: 2.3, spaceBetween: 20 },
+                            768: { slidesPerView: 2.5, spaceBetween: 20 },
+                            1024: { slidesPerView: 3.5, spaceBetween: 30 },
+                            1280: { slidesPerView: 4.2, spaceBetween: 30 },
+                        }}
+                        className="py-4 px-2" // Padding agar navigasi/paginasi tidak terpotong
+                    >
+                        {youtubeItems.map((video) => (
+                            <SwiperSlide key={video.id || video.title} className="h-auto pb-8"> {/* pb-8 untuk ruang paginasi */}
+                                <a href={video.url || '#'} target="_blank" rel="noopener noreferrer" className="block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden group bg-white">
+                                    <div className="relative aspect-video bg-slate-200"> {/* aspect-video untuk rasio 16:9 */}
+                                        {video.thumbnail ? (
+                                            <Image 
+                                                src={video.thumbnail} 
+                                                alt={video.title || "Video thumbnail"} 
+                                                layout="fill" 
+                                                objectFit="cover" 
+                                                onError={(e) => { e.target.style.display='none'; console.warn(`Gagal memuat thumbnail YouTube: ${video.thumbnail}`);}}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center"><FiYoutube className="text-slate-400 w-12 h-12" /></div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 flex items-center justify-center transition-opacity duration-300">
+                                            <FiPlayCircle className="w-12 h-12 sm:w-16 sm:h-16 text-white opacity-70 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300" />
+                                        </div>
+                                    </div>
+                                    <div className="p-3 sm:p-4">
+                                        <h4 className="font-semibold text-sm sm:text-base text-slate-800 group-hover:text-pink-600 transition-colors duration-200 line-clamp-2" title={video.title || "Judul Video"}>
+                                            {video.title || "Judul Video"}
+                                        </h4>
+                                        {video.channelTitle && ( // Tampilkan channel title jika ada
+                                            <p className="text-xs text-slate-500 mt-1">{video.channelTitle}</p>
+                                        )}
+                                    </div>
+                                </a>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                ) : (!youtubeError && youtubeItems.length === 0 && <p className="text-center text-slate-500">Tidak ada video YouTube untuk ditampilkan.</p>)}
+              </section>
+              {/* SECTION YOUTUBE BARU BERAKHIR DI SINI */}
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
