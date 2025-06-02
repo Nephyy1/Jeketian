@@ -35,7 +35,6 @@ const GlobalSwiperStyles = () => (
   `}</style>
 );
 
-
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
   const apiKey = "48-NEPHYY";
@@ -109,7 +108,6 @@ export async function getServerSideProps() {
 
     try {
       if (jkt48Api && typeof jkt48Api.birthday === 'function') {
-        console.log("[getServerSideProps] Attempting to fetch birthdays...");
         const birthdayDataResponse = await jkt48Api.birthday(apiKey);
         console.log("[getServerSideProps] Raw birthdayDataResponse from API (should be an array):", JSON.stringify(birthdayDataResponse, null, 2));
         if (birthdayDataResponse && Array.isArray(birthdayDataResponse)) {
@@ -133,7 +131,7 @@ export async function getServerSideProps() {
         const youtubeDataResponse = await jkt48Api.youtube(apiKey);
         console.log("[getServerSideProps] Raw youtubeDataResponse from API:", JSON.stringify(youtubeDataResponse, null, 2));
         if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-            youtubeItems = youtubeDataResponse.slice(0, 8);
+            youtubeItems = youtubeDataResponse.slice(0, 8); 
         } else if (youtubeDataResponse && youtubeDataResponse.videos && Array.isArray(youtubeDataResponse.videos)) {
             youtubeItems = youtubeDataResponse.videos.slice(0, 8);
         }
