@@ -14,12 +14,6 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'jkt48.com',
-        port: '',
-        pathname: '/images/**',
-      },
     ],
   },
 };
