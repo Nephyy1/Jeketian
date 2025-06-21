@@ -45,35 +45,24 @@ export async function getServerSideProps() {
   let eventError = null;
   let birthdayItems = [];
   let birthdayError = null;
-  let youtubeItems = []; 
-  let youtubeError = null; 
+  let youtubeItems = [];
+  let youtubeError = null;
   let apiKeyError = null;
 
-  console.log("[getServerSideProps] API Key being used:", apiKey);
-
   if (!jkt48Api || typeof jkt48Api.check !== 'function') {
-    console.error("[getServerSideProps] jkt48Api object or check method is not available.");
     apiKeyError = "Fungsi pengecekan API Key tidak tersedia pada package.";
   } else {
     try {
-      console.log("[getServerSideProps] Attempting to validate API Key...");
       const checkResponse = await jkt48Api.check(apiKey);
-      console.log("[getServerSideProps] API Key check response:", JSON.stringify(checkResponse, null, 2));
-
       if (checkResponse && (checkResponse.success === false || checkResponse.valid === false || checkResponse.status === 'error' || checkResponse.status === false)) {
         apiKeyError = `API Key tidak valid atau bermasalah: ${checkResponse.message || 'Respons validasi tidak menunjukkan sukses.'}`;
-        console.error("[getServerSideProps] API Key validation failed based on response structure:", apiKeyError);
-      } else {
-        console.log("[getServerSideProps] API Key validation seems successful. Proceeding...");
       }
     } catch (error) {
-      console.error("[getServerSideProps] Error validating API Key:", error.message);
       apiKeyError = `Gagal validasi API Key: ${error.message || "Kesalahan tidak diketahui saat validasi."}`;
     }
   }
 
   if (!apiKeyError) {
-    console.log("[getServerSideProps] API Key valid, proceeding to fetch data.");
     try {
       if (jkt48Api && typeof jkt48Api.news === 'function') {
         const newsDataResponse = await jkt48Api.news(apiKey);
@@ -109,47 +98,32 @@ export async function getServerSideProps() {
     try {
       if (jkt48Api && typeof jkt48Api.birthday === 'function') {
         const birthdayDataResponse = await jkt48Api.birthday(apiKey);
-        console.log("[getServerSideProps] Raw birthdayDataResponse from API (should be an array):", JSON.stringify(birthdayDataResponse, null, 2));
         if (birthdayDataResponse && Array.isArray(birthdayDataResponse)) {
             birthdayItems = birthdayDataResponse.slice(0, 5);
         } else {
-          console.warn("[getServerSideProps] Birthday data is not in expected array format. Response:", birthdayDataResponse);
           birthdayError = "Format data ulang tahun tidak sesuai.";
         }
       } else {
-        console.error("[getServerSideProps] 'jkt48Api.birthday' is not a function or jkt48Api is not defined.");
         birthdayError = "Metode ulang tahun tidak tersedia.";
       }
     } catch (error) {
-      console.error("[getServerSideProps] Error fetching birthdays:", error.message);
       birthdayError = `Gagal memuat data ulang tahun: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
     try {
       if (jkt48Api && typeof jkt48Api.youtube === 'function') {
-        console.log("[getServerSideProps] Attempting to fetch YouTube videos...");
         const youtubeDataResponse = await jkt48Api.youtube(apiKey);
-        console.log("[getServerSideProps] Raw youtubeDataResponse from API:", JSON.stringify(youtubeDataResponse, null, 2));
         if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-            youtubeItems = youtubeDataResponse.slice(0, 8); 
-        } else if (youtubeDataResponse && youtubeDataResponse.videos && Array.isArray(youtubeDataResponse.videos)) {
-            youtubeItems = youtubeDataResponse.videos.slice(0, 8);
-        }
-         else {
-          console.warn("[getServerSideProps] YouTube data is not in expected array format. Response:", youtubeDataResponse);
+            youtubeItems = youtubeDataResponse.slice(0, 8);
+        } else {
           youtubeError = "Format data YouTube tidak sesuai.";
         }
       } else {
-        console.error("[getServerSideProps] 'jkt48Api.youtube' is not a function or jkt48Api is not defined.");
         youtubeError = "Metode YouTube tidak tersedia.";
       }
     } catch (error) {
-      console.error("[getServerSideProps] Error fetching YouTube videos:", error.message);
       youtubeError = `Gagal memuat video YouTube: ${error.message || "Kesalahan tidak diketahui"}`;
     }
-
-  } else {
-     console.log("[getServerSideProps] API Key validation failed. Skipping data fetching.");
   }
 
   return {
