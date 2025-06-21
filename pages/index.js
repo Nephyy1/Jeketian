@@ -4,20 +4,12 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
+    FiFilm, FiUsers, FiCalendar, FiInfo, 
     FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
-    FiHelpCircle, FiYoutube, FiPlayCircle
+    FiHelpCircle
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 import { useState } from 'react';
-
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, A11y } from 'swiper/modules';
-
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import Footer from '../components/Footer';
 
 const GlobalSwiperStyles = () => (
   <style jsx global>{`
@@ -40,8 +32,6 @@ export async function getServerSideProps() {
   let eventError = null;
   let birthdayItems = [];
   let birthdayError = null;
-  let youtubeItems = []; 
-  let youtubeError = null; 
   let apiKeyError = null;
 
   if (!jkt48Api || typeof jkt48Api.check !== 'function') {
@@ -91,17 +81,6 @@ export async function getServerSideProps() {
       birthdayError = `Gagal memuat data ulang tahun: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
-    try {
-      const youtubeDataResponse = await jkt48Api.youtube(apiKey);
-      if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-          youtubeItems = youtubeDataResponse.slice(0, 8); 
-      } else {
-        youtubeError = "Format data YouTube tidak sesuai.";
-      }
-    } catch (error) {
-      youtubeError = `Gagal memuat video YouTube: ${error.message || "Kesalahan tidak diketahui"}`;
-    }
-
   }
 
   return {
@@ -109,7 +88,6 @@ export async function getServerSideProps() {
       newsItems, newsError,
       eventItems, eventError,
       birthdayItems, birthdayError,
-      youtubeItems, youtubeError,
       apiKeyError,
     },
   };
@@ -151,7 +129,6 @@ export default function HomePage({
   newsItems, newsError, 
   eventItems, eventError, 
   birthdayItems, birthdayError, 
-  youtubeItems, youtubeError,
   apiKeyError 
 }) {
   const formatDate = (dateString, includeTime = false, onlyMonthDay = false) => {
@@ -259,63 +236,6 @@ export default function HomePage({
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12">
-                    <h2 className="inline-flex items-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
-                        <FiYoutube className="text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-br from-red-500 via-orange-400 to-yellow-400 mr-2 sm:mr-3 drop-shadow-sm" />
-                        JKT48 di YouTube
-                    </h2>
-                </div>
-                {youtubeError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{youtubeError}</p>)}
-                {!youtubeError && youtubeItems && youtubeItems.length > 0 ? (
-                    <Swiper
-                        modules={[Navigation, Pagination, A11y]}
-                        spaceBetween={16}
-                        slidesPerView={1.3}
-                        navigation
-                        pagination={{ clickable: true, dynamicBullets: true }}
-                        grabCursor={true}
-                        breakpoints={{
-                            640: { slidesPerView: 2.3, spaceBetween: 20 },
-                            768: { slidesPerView: 2.5, spaceBetween: 20 },
-                            1024: { slidesPerView: 3.5, spaceBetween: 30 },
-                            1280: { slidesPerView: 4.2, spaceBetween: 30 },
-                        }}
-                        className="py-4 px-2 relative"
-                    >
-                        {youtubeItems.map((video) => (
-                            <SwiperSlide key={video.videoId || video.title} className="h-auto pb-8"> 
-                                <a href={video.videoUrl || '#'} target="_blank" rel="noopener noreferrer" className="block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden group bg-white">
-                                    <div className="relative aspect-video bg-slate-200">
-                                        {video.thumbnail ? (
-                                            <img 
-                                                src={video.thumbnail} 
-                                                alt={video.title || "Video thumbnail"} 
-                                                className="absolute inset-0 w-full h-full object-cover"
-                                                loading="lazy"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center"><FiYoutube className="text-slate-400 w-12 h-12" /></div>
-                                        )}
-                                        <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 flex items-center justify-center transition-opacity duration-300">
-                                            <FiPlayCircle className="w-12 h-12 sm:w-16 sm:h-16 text-white opacity-70 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300" />
-                                        </div>
-                                    </div>
-                                    <div className="p-3 sm:p-4">
-                                        <h4 className="font-semibold text-sm sm:text-base text-slate-800 group-hover:text-pink-600 transition-colors duration-200 line-clamp-2" title={video.title || "Judul Video"}>
-                                            {video.title || "Judul Video"}
-                                        </h4>
-                                        {video.channelName && ( 
-                                            <p className="text-xs text-slate-500 mt-1">{video.channelName}</p>
-                                        )}
-                                    </div>
-                                </a>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                ) : (!youtubeError && youtubeItems.length === 0 && <p className="text-center text-slate-500">Tidak ada video YouTube untuk ditampilkan.</p>)}
-              </section>
-
-              <section className="py-12 md:py-16">
-                <div className="text-center mb-10 md:mb-12">
                     <h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>
                         Pertanyaan Umum (FAQ)
                     </h2>
@@ -335,4 +255,4 @@ export default function HomePage({
       <Footer />
     </>
   );
-}
+                                                     }
