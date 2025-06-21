@@ -22,18 +22,12 @@ const GlobalSwiperStyles = () => (
   <style jsx global>{`
     .swiper-button-prev,
     .swiper-button-next {
-      color: transparent !important;
-      background-image: none !important;
-      background-color: transparent !important;
-      width: 2.75rem !important;
-      height: 2.75rem !important;
-    }
-    .swiper-button-prev::after,
-    .swiper-button-next::after {
-        content: '' !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
   `}</style>
 );
+
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -45,8 +39,8 @@ export async function getServerSideProps() {
   let eventError = null;
   let birthdayItems = [];
   let birthdayError = null;
-  let youtubeItems = [];
-  let youtubeError = null;
+  let youtubeItems = []; 
+  let youtubeError = null; 
   let apiKeyError = null;
 
   if (!jkt48Api || typeof jkt48Api.check !== 'function') {
@@ -114,7 +108,7 @@ export async function getServerSideProps() {
       if (jkt48Api && typeof jkt48Api.youtube === 'function') {
         const youtubeDataResponse = await jkt48Api.youtube(apiKey);
         if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-            youtubeItems = youtubeDataResponse.slice(0, 8);
+            youtubeItems = youtubeDataResponse.slice(0, 8); 
         } else {
           youtubeError = "Format data YouTube tidak sesuai.";
         }
@@ -124,6 +118,7 @@ export async function getServerSideProps() {
     } catch (error) {
       youtubeError = `Gagal memuat video YouTube: ${error.message || "Kesalahan tidak diketahui"}`;
     }
+
   }
 
   return {
@@ -250,22 +245,10 @@ export default function HomePage({
                       <div>
                         <h4 className="text-xl sm:text-2xl font-semibold text-slate-700 mb-4 mt-6 md:mt-0">Fitur Unggulan Kami:</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-slate-600 text-base">
-                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <FiUsers className="text-pink-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
-                            <span className="group-hover:text-pink-700 transition-colors duration-200">Informasi lengkap dan update aktivitas para member JKT48.</span>
-                          </div>
-                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <FiCalendar className="text-purple-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
-                            <span className="group-hover:text-purple-700 transition-colors duration-200">Jadwal pertunjukan teater, event spesial, dan penampilan live.</span>
-                          </div>
-                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <FiInfo className="text-orange-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
-                            <span className="group-hover:text-orange-700 transition-colors duration-200">Berita terbaru dan semua pengumuman resmi dari JKT48.</span>
-                          </div>
-                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <FiFilm className="text-red-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" />
-                            <span className="group-hover:text-red-700 transition-colors duration-200">Akses mudah ke konten Live Streaming dan siaran ulang (Replay).</span>
-                          </div>
+                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"><FiUsers className="text-pink-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" /><span className="group-hover:text-pink-700 transition-colors duration-200">Informasi lengkap dan update aktivitas para member JKT48.</span></div>
+                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"><FiCalendar className="text-purple-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" /><span className="group-hover:text-purple-700 transition-colors duration-200">Jadwal pertunjukan teater, event spesial, dan penampilan live.</span></div>
+                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"><FiInfo className="text-orange-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" /><span className="group-hover:text-orange-700 transition-colors duration-200">Berita terbaru dan semua pengumuman resmi dari JKT48.</span></div>
+                          <div className="flex items-start group cursor-default bg-white/50 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"><FiFilm className="text-red-500 mr-3 mt-1 flex-shrink-0 text-xl group-hover:scale-110 transition-transform duration-200" /><span className="group-hover:text-red-700 transition-colors duration-200">Akses mudah ke konten Live Streaming dan siaran ulang (Replay).</span></div>
                         </div>
                       </div>
                     </div>
@@ -326,10 +309,13 @@ export default function HomePage({
                                                 layout="fill" 
                                                 objectFit="cover" 
                                                 onError={(e) => { 
-                                                    const target = e.target; 
-                                                    if (target.parentElement) target.parentElement.style.backgroundColor = '#e2e8f0';
+                                                    const target = e.target;
+                                                    if(target.parentElement) {
+                                                        target.parentElement.classList.remove('bg-slate-200');
+                                                        target.parentElement.classList.add('bg-red-200');
+                                                    }
                                                     target.style.display='none'; 
-                                                    console.warn(`Gagal memuat thumbnail YouTube: ${video.thumbnail}`);
+                                                    console.error(`ERROR LOADING THUMBNAIL: ${video.thumbnail}. Pastikan domain i.ytimg.com ada di next.config.js dan server sudah di-restart.`);
                                                 }}
                                             />
                                         ) : (
