@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
 import Image from 'next/image';
 import { 
-    FiFilm, FiUsers, FiCalendar, FiInfo, 
+    FiFilm, FiUsers, FiCalendar, FiInfo, FiRss, 
     FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
     FiHelpCircle, FiYoutube, FiPlayCircle
 } from 'react-icons/fi';
@@ -17,6 +17,7 @@ import { Navigation, Pagination, A11y } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import Footer from '../components/Footer';
 
 const GlobalSwiperStyles = () => (
   <style jsx global>{`
@@ -292,9 +293,7 @@ export default function HomePage({
                                                 loading="lazy"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <FiYoutube className="text-slate-400 w-12 h-12" />
-                                            </div>
+                                            <div className="w-full h-full flex items-center justify-center"><FiYoutube className="text-slate-400 w-12 h-12" /></div>
                                         )}
                                         <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 flex items-center justify-center transition-opacity duration-300">
                                             <FiPlayCircle className="w-12 h-12 sm:w-16 sm:h-16 text-white opacity-70 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300" />
@@ -333,9 +332,7 @@ export default function HomePage({
         )}
       </main>
 
-      <footer className="bg-slate-800 text-white text-center p-6">
-        <p>© {new Date().getFullYear()} Jeketian. Dibuat dengan ❤️</p>
-      </footer>
+      <Footer />
     </>
   );
 }
