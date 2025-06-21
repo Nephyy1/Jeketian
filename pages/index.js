@@ -58,62 +58,44 @@ export async function getServerSideProps() {
 
   if (!apiKeyError) {
     try {
-      if (jkt48Api && typeof jkt48Api.news === 'function') {
-        const newsDataResponse = await jkt48Api.news(apiKey);
-        if (newsDataResponse && newsDataResponse.news && Array.isArray(newsDataResponse.news)) {
-          newsItems = newsDataResponse.news.slice(0, 6);
-        } else {
-          newsError = "Format data berita tidak sesuai.";
-        }
+      const newsDataResponse = await jkt48Api.news(apiKey);
+      if (newsDataResponse && newsDataResponse.news && Array.isArray(newsDataResponse.news)) {
+        newsItems = newsDataResponse.news.slice(0, 6);
       } else {
-        newsError = "Metode berita tidak tersedia.";
+        newsError = "Format data berita tidak sesuai.";
       }
     } catch (error) {
       newsError = `Gagal memuat berita: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
     try {
-      if (jkt48Api && typeof jkt48Api.events === 'function') {
-        const eventDataResponse = await jkt48Api.events(apiKey);
-        if (eventDataResponse && Array.isArray(eventDataResponse)) {
-          eventItems = eventDataResponse.slice(0, 4);
-        } else if (eventDataResponse && eventDataResponse.events && Array.isArray(eventDataResponse.events)) {
-           eventItems = eventDataResponse.events.slice(0, 4);
-        } else {
-          eventError = "Format data event tidak sesuai atau API event bermasalah.";
-        }
+      const eventDataResponse = await jkt48Api.events(apiKey);
+      if (eventDataResponse && Array.isArray(eventDataResponse)) {
+        eventItems = eventDataResponse.slice(0, 4);
       } else {
-        eventError = "Metode event tidak tersedia.";
+        eventError = "Format data event tidak sesuai atau API event bermasalah.";
       }
     } catch (error) {
       eventError = `Gagal memuat event: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
     try {
-      if (jkt48Api && typeof jkt48Api.birthday === 'function') {
-        const birthdayDataResponse = await jkt48Api.birthday(apiKey);
-        if (birthdayDataResponse && Array.isArray(birthdayDataResponse)) {
-            birthdayItems = birthdayDataResponse.slice(0, 5);
-        } else {
-          birthdayError = "Format data ulang tahun tidak sesuai.";
-        }
+      const birthdayDataResponse = await jkt48Api.birthday(apiKey);
+      if (birthdayDataResponse && Array.isArray(birthdayDataResponse)) {
+          birthdayItems = birthdayDataResponse.slice(0, 5);
       } else {
-        birthdayError = "Metode ulang tahun tidak tersedia.";
+        birthdayError = "Format data ulang tahun tidak sesuai.";
       }
     } catch (error) {
       birthdayError = `Gagal memuat data ulang tahun: ${error.message || "Kesalahan tidak diketahui"}`;
     }
 
     try {
-      if (jkt48Api && typeof jkt48Api.youtube === 'function') {
-        const youtubeDataResponse = await jkt48Api.youtube(apiKey);
-        if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
-            youtubeItems = youtubeDataResponse.slice(0, 8); 
-        } else {
-          youtubeError = "Format data YouTube tidak sesuai.";
-        }
+      const youtubeDataResponse = await jkt48Api.youtube(apiKey);
+      if (youtubeDataResponse && Array.isArray(youtubeDataResponse)) {
+          youtubeItems = youtubeDataResponse.slice(0, 8); 
       } else {
-        youtubeError = "Metode YouTube tidak tersedia.";
+        youtubeError = "Format data YouTube tidak sesuai.";
       }
     } catch (error) {
       youtubeError = `Gagal memuat video YouTube: ${error.message || "Kesalahan tidak diketahui"}`;
@@ -259,13 +241,13 @@ export default function HomePage({
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">Hot News JKT48</h2></div>
                 {newsError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{newsError}</p>)}
-                {!newsError && newsItems && newsItems.length > 0 ? (<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{newsItems.map((item) => {let localIconPath = null; if (item.label) {const labelParts = item.label.split('/'); const filename = labelParts.pop(); if (filename) { localIconPath = `/img/${filename}`; }} return (<div key={item.id || item.title} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"><div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between"><div><h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">{item.title || "Judul tidak tersedia"}</h3><p className="text-xs text-slate-500 mb-3 flex items-center"><FiCalendar className="mr-2 text-slate-400" />{formatDate(item.date)}</p>{localIconPath && (<div className="mt-2 flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori:</span><Image src={localIconPath} alt="Ikon Kategori Berita" width={40} height={40} className="inline-block object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori lokal BERITA: ${localIconPath}`); }}/></div>)}</div><div className="mt-4">{item.id ? (<Link href={`/news/${item.id}`} legacyBehavior><a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">Baca Selengkapnya<FiExternalLink className="ml-2 h-4 w-4" /></a></Link>) : (<span className="inline-flex items-center text-sm text-gray-400 font-medium">(Detail tidak tersedia)</span>)}</div></div></div>);})}</div>) : (!newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>)}
+                {!newsError && newsItems && newsItems.length > 0 ? (<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{newsItems.map((item) => {let localIconPath = null; if (item.label) {const labelParts = item.label.split('/'); const filename = labelParts.pop(); if (filename) { localIconPath = `/img/${filename}`; }} return (<div key={item.id || item.title} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"><div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between"><div><h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">{item.title || "Judul tidak tersedia"}</h3><p className="text-xs text-slate-500 mb-3 flex items-center"><FiCalendar className="mr-2 text-slate-400" />{formatDate(item.date)}</p>{localIconPath && (<div className="mt-2 flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori:</span><Image src={localIconPath} alt="Ikon Kategori Berita" width={40} height={40} className="inline-block object-contain" onError={(e) => { e.target.style.display = 'none'; }}/></div>)}</div><div className="mt-4">{item.id ? (<Link href={`/news/${item.id}`} legacyBehavior><a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">Baca Selengkapnya<FiExternalLink className="ml-2 h-4 w-4" /></a></Link>) : (<span className="inline-flex items-center text-sm text-gray-400 font-medium">(Detail tidak tersedia)</span>)}</div></div></div>);})}</div>) : (!newsError && <p className="text-center text-slate-500">Tidak ada berita terkini.</p>)}
               </section>
 
               <section className="py-12 md:py-16">
                 <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm relative" style={{ left: '-2px' }}>Jadwal Event Mendatang</h2></div>
                 {eventError && (<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{eventError}</p>)}
-                {!eventError && eventItems && eventItems.length > 0 ? (<div className="grid md:grid-cols-2 gap-6 md:gap-8">{eventItems.map((event) => {let localEventIconPath = null; if (event.label && typeof event.label === 'string') {const labelUrlParts = event.label.split('/'); const eventLabelFilename = labelUrlParts.pop(); if (eventLabelFilename) { localEventIconPath = `/img/${eventLabelFilename}`; }} return (<div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden"><div className="h-2 bg-gradient-to-r from-pink-500 via-red-500 to-orange-400"></div><div className="p-5 space-y-3"><h3 className="text-lg font-semibold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight truncate">{event.title || "Nama Event Tidak Tersedia"}</h3><div className="flex items-center text-sm text-slate-500"><FiCalendar className="mr-2 text-pink-500 flex-shrink-0" /><span>{formatDate(event.date, true)}</span></div>{localEventIconPath && (<div className="flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori Event:</span><Image src={localEventIconPath} alt="Ikon Kategori Event" width={40} height={40} className="mr-1.5 object-contain" onError={(e) => { e.target.style.display = 'none'; console.warn(`Gagal memuat ikon kategori EVENT lokal: ${localEventIconPath}`); }}/></div>)}{event.url && (<a href={event.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm text-pink-600 hover:text-purple-700 font-medium transition-colors duration-300 mt-2 group/link">Lihat Detail Event<FiExternalLink className="ml-1.5 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" /></a>)}</div></div>);})}</div>) : (!eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>)}
+                {!eventError && eventItems && eventItems.length > 0 ? (<div className="grid md:grid-cols-2 gap-6 md:gap-8">{eventItems.map((event) => {let localEventIconPath = null; if (event.label && typeof event.label === 'string') {const labelUrlParts = event.label.split('/'); const eventLabelFilename = labelUrlParts.pop(); if (eventLabelFilename) { localEventIconPath = `/img/${eventLabelFilename}`; }} return (<div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 overflow-hidden"><div className="h-2 bg-gradient-to-r from-pink-500 via-red-500 to-orange-400"></div><div className="p-5 space-y-3"><h3 className="text-lg font-semibold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight truncate">{event.title || "Nama Event Tidak Tersedia"}</h3><div className="flex items-center text-sm text-slate-500"><FiCalendar className="mr-2 text-pink-500 flex-shrink-0" /><span>{formatDate(event.date, true)}</span></div>{localEventIconPath && (<div className="flex items-center text-xs text-gray-500"><span className="mr-1.5">Kategori Event:</span><Image src={localEventIconPath} alt="Ikon Kategori Event" width={40} height={40} className="mr-1.5 object-contain" onError={(e) => { e.target.style.display = 'none'; }}/></div>)}{event.url && (<a href={event.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm text-pink-600 hover:text-purple-700 font-medium transition-colors duration-300 mt-2 group/link">Lihat Detail Event<FiExternalLink className="ml-1.5 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" /></a>)}</div></div>);})}</div>) : (!eventError && eventItems.length === 0 && <p className="text-center text-slate-500">Tidak ada event mendatang yang dijadwalkan.</p>)}
               </section>
 
               <section className="py-12 md:py-16">
@@ -303,23 +285,16 @@ export default function HomePage({
                                 <a href={video.videoUrl || '#'} target="_blank" rel="noopener noreferrer" className="block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden group bg-white">
                                     <div className="relative aspect-video bg-slate-200">
                                         {video.thumbnail ? (
-                                            <Image 
+                                            <img 
                                                 src={video.thumbnail} 
                                                 alt={video.title || "Video thumbnail"} 
-                                                layout="fill" 
-                                                objectFit="cover" 
-                                                onError={(e) => { 
-                                                    const target = e.target;
-                                                    if(target.parentElement) {
-                                                        target.parentElement.classList.remove('bg-slate-200');
-                                                        target.parentElement.classList.add('bg-red-200');
-                                                    }
-                                                    target.style.display='none'; 
-                                                    console.error(`ERROR LOADING THUMBNAIL: ${video.thumbnail}. Pastikan domain i.ytimg.com ada di next.config.js dan server sudah di-restart.`);
-                                                }}
+                                                className="absolute inset-0 w-full h-full object-cover"
+                                                loading="lazy"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center"><FiYoutube className="text-slate-400 w-12 h-12" /></div>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <FiYoutube className="text-slate-400 w-12 h-12" />
+                                            </div>
                                         )}
                                         <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 flex items-center justify-center transition-opacity duration-300">
                                             <FiPlayCircle className="w-12 h-12 sm:w-16 sm:h-16 text-white opacity-70 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300" />
