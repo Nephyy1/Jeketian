@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
+import Footer from '../components/Footer';
 import Image from 'next/image';
 import { 
     FiFilm, FiUsers, FiCalendar, FiInfo, 
