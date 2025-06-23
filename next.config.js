@@ -32,6 +32,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.idntimes.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.idn.media',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
