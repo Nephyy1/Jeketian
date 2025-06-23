@@ -1,8 +1,7 @@
 import Head from 'next/head';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FiCalendar, FiClock, FiExternalLink } from 'react-icons/fi';
-import Link from 'next/link';
+import { FiClock, FiExternalLink } from 'react-icons/fi';
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -10,22 +9,35 @@ export async function getServerSideProps() {
   
   let scheduleItems = [];
   let error = null;
+  let apiKeyError = null;
 
   try {
-    const eventsData = await jkt48Api.events(apiKey);
-    if (Array.isArray(eventsData) && eventsData.length > 0) {
-      scheduleItems = eventsData;
-    } else {
-      error = "Saat ini tidak ada jadwal yang tersedia.";
+    const checkResponse = await jkt48Api.check(apiKey);
+    if (checkResponse && (checkResponse.success === false || checkResponse.valid === false || checkResponse.status === 'error' || checkResponse.status === false)) {
+      apiKeyError = `API Key tidak valid atau bermasalah: ${checkResponse.message || 'Respons validasi tidak menunjukkan sukses.'}`;
     }
   } catch (e) {
-    error = `Gagal memuat jadwal: ${e.message || "Kesalahan tidak diketahui"}`;
+    apiKeyError = `Gagal validasi API Key: ${e.message || "Kesalahan tidak diketahui saat validasi."}`;
+  }
+
+  if (!apiKeyError) {
+    try {
+      const eventsData = await jkt48Api.events(apiKey);
+      if (Array.isArray(eventsData) && eventsData.length > 0) {
+        scheduleItems = eventsData;
+      } else {
+        error = "Saat ini tidak ada jadwal yang tersedia.";
+      }
+    } catch (e) {
+      error = `Gagal memuat jadwal: ${e.message || "Kesalahan tidak diketahui"}`;
+    }
   }
 
   return {
     props: {
       scheduleItems,
       error,
+      apiKeyError,
     },
   };
 }
@@ -73,7 +85,7 @@ const ScheduleCard = ({ item }) => {
 };
 
 
-export default function SchedulePage({ scheduleItems, error }) {
+export default function SchedulePage({ scheduleItems, error, apiKeyError }) {
   return (
     <>
       <Head>
@@ -86,24 +98,34 @@ export default function SchedulePage({ scheduleItems, error }) {
 
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="text-center mb-10 md:mb-12">
-            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 drop-shadow-sm">
-              Jadwal Acara & Teater
-            </h1>
-          </div>
-          
-          {error ? (
-            <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg max-w-lg mx-auto shadow-sm">
-              <p>{error}</p>
+          {apiKeyError ? (
+            <div className="text-center">
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md max-w-lg mx-auto" role="alert">
+                <p className="font-bold text-lg mb-2">Validasi API Key Gagal</p>
+                <p className="text-sm">{apiKeyError}</p>
+              </div>
             </div>
           ) : (
-            <div className="max-w-3xl mx-auto space-y-6">
-              {scheduleItems.map((item, index) => (
-                <ScheduleCard key={item.id || index} item={item} />
-              ))}
-            </div>
+            <>
+              <div className="text-center mb-10 md:mb-12">
+                <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 drop-shadow-sm">
+                  Jadwal Acara & Teater
+                </h1>
+              </div>
+              
+              {error ? (
+                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg max-w-lg mx-auto shadow-sm">
+                  <p>{error}</p>
+                </div>
+              ) : (
+                <div className="max-w-3xl mx-auto space-y-6">
+                  {scheduleItems.map((item, index) => (
+                    <ScheduleCard key={item.id || index} item={item} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
-
         </div>
       </main>
 
