@@ -1,7 +1,5 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import Image from 'next/image';
 import { FiCalendar, FiClock, FiUsers, FiGift, FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 
@@ -99,8 +97,6 @@ export default function SchedulePage({ scheduleItems, error }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
-
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="text-center mb-6">
@@ -131,8 +127,6 @@ export default function SchedulePage({ scheduleItems, error }) {
           )}
         </div>
       </main>
-
-      <Footer />
     </>
   );
 }
