@@ -12,27 +12,39 @@ export async function getServerSideProps() {
   let replays = [];
   let liveError = null;
   let replayError = null;
+  let apiKeyError = null;
 
   try {
-    const liveData = await jkt48Api.live(apiKey);
-    if (Array.isArray(liveData) && liveData.length > 0) {
-      liveStreams = liveData;
-    } else {
-      liveError = "Tidak ada yang sedang live saat ini.";
+    const checkResponse = await jkt48Api.check(apiKey);
+    if (checkResponse && (checkResponse.success === false || checkResponse.valid === false || checkResponse.status === 'error' || checkResponse.status === false)) {
+      apiKeyError = `API Key tidak valid atau bermasalah: ${checkResponse.message || 'Respons validasi tidak menunjukkan sukses.'}`;
     }
   } catch (e) {
-    liveError = "Gagal memuat data live stream.";
+    apiKeyError = `Gagal validasi API Key: ${e.message || "Kesalahan tidak diketahui saat validasi."}`;
   }
 
-  try {
-    const replayData = await jkt48Api.replay(apiKey);
-    if (Array.isArray(replayData) && replayData.length > 0) {
-      replays = replayData;
-    } else {
-      replayError = "Tidak ada siaran ulang yang tersedia.";
+  if (!apiKeyError) {
+    try {
+      const liveData = await jkt48Api.live(apiKey);
+      if (Array.isArray(liveData) && liveData.length > 0) {
+        liveStreams = liveData;
+      } else {
+        liveError = "Tidak ada yang sedang live saat ini.";
+      }
+    } catch (e) {
+      liveError = "Gagal memuat data live stream.";
     }
-  } catch (e) {
-    replayError = "Gagal memuat data replay.";
+
+    try {
+      const replayData = await jkt48Api.replay(apiKey);
+      if (Array.isArray(replayData) && replayData.length > 0) {
+        replays = replayData;
+      } else {
+        replayError = "Tidak ada siaran ulang yang tersedia.";
+      }
+    } catch (e) {
+      replayError = "Gagal memuat data replay.";
+    }
   }
 
   return {
@@ -41,6 +53,7 @@ export async function getServerSideProps() {
       replays,
       liveError,
       replayError,
+      apiKeyError,
     },
   };
 }
@@ -63,14 +76,16 @@ const PlatformIcon = ({ platform }) => {
 const LiveCard = ({ item }) => (
   <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100">
     <a href={item.url} target="_blank" rel="noopener noreferrer" className="block">
-      <div className="aspect-w-16 aspect-h-9 relative">
-        <Image
-          src={item.image}
-          alt={`Thumbnail for ${item.member.name}`}
-          layout="fill"
-          objectFit="cover"
-          className="group-hover:scale-105 transition-transform duration-300"
-        />
+      <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
+        {item.image && (
+          <Image
+            src={item.image}
+            alt={`Thumbnail for ${item.member?.name || 'Live Stream'}`}
+            layout="fill"
+            objectFit="cover"
+            className="group-hover:scale-105 transition-transform duration-300"
+          />
+        )}
         <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center animate-pulse">
           <div className="w-2 h-2 bg-white rounded-full mr-1.5"></div>
           LIVE
@@ -79,15 +94,17 @@ const LiveCard = ({ item }) => (
     </a>
     <div className="p-4">
       <div className="flex items-start space-x-3">
-        <Image
-          src={item.member.img}
-          alt={item.member.name}
-          width={48}
-          height={48}
-          className="rounded-full border-2 border-slate-200"
-        />
+        {item.member?.img && (
+          <Image
+            src={item.member.img}
+            alt={item.member.name}
+            width={48}
+            height={48}
+            className="rounded-full border-2 border-slate-200 flex-shrink-0"
+          />
+        )}
         <div className="flex-grow">
-          <h3 className="font-bold text-slate-800 leading-tight">{item.member.name}</h3>
+          <h3 className="font-bold text-slate-800 leading-tight">{item.member?.name || 'JKT48 Official'}</h3>
           <div className="flex items-center text-sm text-slate-500 mt-1">
             <PlatformIcon platform={item.platform} />
             <span className="ml-1.5">{item.platform}</span>
@@ -107,14 +124,16 @@ const ReplayCard = ({ item }) => {
 
     return (
         <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100">
-            <div className="aspect-w-16 aspect-h-9 relative">
+            <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
+              {item.image && (
                 <Image
-                src={item.image}
-                alt={`Thumbnail for ${item.title}`}
-                layout="fill"
-                objectFit="cover"
-                className="group-hover:scale-105 transition-transform duration-300"
+                  src={item.image}
+                  alt={`Thumbnail for ${item.title}`}
+                  layout="fill"
+                  objectFit="cover"
+                  className="group-hover:scale-105 transition-transform duration-300"
                 />
+              )}
             </div>
             <div className="p-4 flex flex-col h-full">
                 <h3 className="font-bold text-slate-800 leading-tight flex-grow">{item.title}</h3>
@@ -130,7 +149,7 @@ const ReplayCard = ({ item }) => {
     );
 };
 
-export default function LiveReplyPage({ liveStreams, replays, liveError, replayError }) {
+export default function LiveReplyPage({ liveStreams, replays, liveError, replayError, apiKeyError }) {
   return (
     <>
       <Head>
@@ -143,43 +162,54 @@ export default function LiveReplyPage({ liveStreams, replays, liveError, replayE
 
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="text-center mb-10 md:mb-12">
-            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
-              Live & Reply
-            </h1>
-          </div>
+          {apiKeyError ? (
+            <div className="text-center">
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md max-w-lg mx-auto" role="alert">
+                <p className="font-bold text-lg mb-2">Validasi API Key Gagal</p>
+                <p className="text-sm">{apiKeyError}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-10 md:mb-12">
+                <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
+                  Live & Reply
+                </h1>
+              </div>
 
-          <div className="max-w-7xl mx-auto space-y-16">
-            <section>
-              <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
-                <FiRadio className="mr-3 text-red-500"/> Sedang Live Saat Ini
-              </h2>
-              {liveError ? (
-                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
-                  <p>{liveError}</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {liveStreams.map((item) => <LiveCard key={item.member.url} item={item} />)}
-                </div>
-              )}
-            </section>
-            
-            <section>
-              <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
-                <FiRewind className="mr-3 text-purple-500"/> Tonton Ulang (Replay)
-              </h2>
-              {replayError ? (
-                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
-                  <p>{replayError}</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {replays.map((item, index) => <ReplayCard key={item.url || index} item={item} />)}
-                </div>
-              )}
-            </section>
-          </div>
+              <div className="max-w-7xl mx-auto space-y-16">
+                <section>
+                  <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                    <FiRadio className="mr-3 text-red-500"/> Sedang Live Saat Ini
+                  </h2>
+                  {liveError ? (
+                    <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                      <p>{liveError}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {liveStreams.map((item, index) => <LiveCard key={item.url || index} item={item} />)}
+                    </div>
+                  )}
+                </section>
+                
+                <section>
+                  <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                    <FiRewind className="mr-3 text-purple-500"/> Tonton Ulang (Replay)
+                  </h2>
+                  {replayError ? (
+                    <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                      <p>{replayError}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {replays.map((item, index) => <ReplayCard key={item.url || index} item={item} />)}
+                    </div>
+                  )}
+                </section>
+              </div>
+            </>
+          )}
         </div>
       </main>
 
