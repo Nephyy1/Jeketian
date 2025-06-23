@@ -52,7 +52,7 @@ export async function getServerSideProps() {
 const PlatformIcon = ({ type }) => {
     const lowerType = type?.toLowerCase() || '';
     if (lowerType.includes('youtube')) return <FiYoutube className="text-red-500" title="YouTube" />;
-    if (lowerType.includes('showroom')) return <FiVideo className="text-sky-500" title="Showroom" />;
+    if (lowerType.includes('showroom')) return <FiVideo className="text-teal-500" title="Showroom" />;
     if (lowerType.includes('idn')) return <FiPlayCircle className="text-orange-500" title="IDN Live" />;
     return <FiRadio className="text-slate-400" title={type} />;
 };
@@ -174,7 +174,7 @@ export default function HistoryPage({ recentLives, replayVideos, recentError, re
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="text-center mb-6">
-            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 drop-shadow-sm">
+            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
               Riwayat & Tonton Ulang
             </h1>
           </div>
