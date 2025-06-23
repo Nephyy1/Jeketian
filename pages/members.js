@@ -22,7 +22,22 @@ export async function getServerSideProps() {
     const data = await response.json();
     
     if (data && Array.isArray(data)) {
-      members = data.filter(member => !member.is_graduate && member.group !== 'official');
+      let activeMembers = data.filter(member => !member.is_graduate && member.group !== 'official');
+      
+      const getGenNumber = (genString) => {
+        if (!genString) return 0;
+        const match = genString.match(/(\d+)/);
+        return match ? parseInt(match[0], 10) : 0;
+      };
+
+      activeMembers.sort((a, b) => {
+        const genA = getGenNumber(a.generation);
+        const genB = getGenNumber(b.generation);
+        return genB - genA;
+      });
+
+      members = activeMembers;
+
     } else {
       error = "Tidak ada data member yang ditemukan.";
     }
@@ -51,10 +66,10 @@ const SocialIcon = ({ title, url }) => {
             icon = <FiInstagram className="text-pink-600" />;
             break;
         case 'tiktok':
-            icon = <FaTiktok className="text-slate-700" />;
+            icon = <FaTiktok className="text-purple-600" />;
             break;
         case 'showroom':
-            icon = <FiVideo className="text-blue-500" />;
+            icon = <FiVideo className="text-teal-500" />;
             break;
         case 'idn':
             icon = <FiPlayCircle className="text-orange-500" />;
@@ -67,7 +82,7 @@ const SocialIcon = ({ title, url }) => {
     }
 
     return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-125 transition-transform">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-slate-800 hover:scale-125 transition-transform duration-200">
             {icon}
         </a>
     );
@@ -88,16 +103,16 @@ const MemberCard = ({ member }) => {
           objectPosition="top"
           className="group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 p-4">
-            <h3 className="text-lg font-bold text-white tracking-wide drop-shadow-md">{member.name}</h3>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 p-3">
+            <h3 className="text-lg font-bold text-white tracking-wide drop-shadow-lg">{member.name}</h3>
         </div>
       </div>
       <div className="p-4 border-t border-slate-100 flex-grow flex flex-col justify-between">
         <div>
-          <span className="text-xs font-bold bg-pink-100 text-pink-700 px-3 py-1 rounded-full">{generationText}</span>
+          <span className="text-xs font-bold bg-pink-100 text-pink-800 px-3 py-1 rounded-full">{generationText}</span>
         </div>
-        <div className="flex items-center justify-center space-x-5 mt-4">
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-4">
           {member.socials.map(social => (
             <SocialIcon key={social.title} title={social.title} url={social.url} />
           ))}
@@ -121,7 +136,7 @@ export default function MembersPage({ members, error }) {
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="text-center mb-6">
-            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-teal-500 via-sky-500 to-purple-600 drop-shadow-sm">
+            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
               Member JKT48
             </h1>
           </div>
