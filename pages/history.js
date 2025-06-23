@@ -6,26 +6,45 @@ import Image from 'next/image';
 import { FiArrowLeft, FiClock, FiEye, FiZap, FiYoutube, FiVideo, FiPlayCircle, FiRadio } from 'react-icons/fi';
 
 export async function getServerSideProps() {
+  const apiKey = "48-NEPHYY";
+  
   let recentLives = [];
-  let error = null;
+  let replayVideos = [];
+  let recentError = null;
+  let replayError = null;
 
   try {
-    const response = await fetch(`https://api.jkt48connect.my.id/api/recent?api_key=48-NEPHYY&limit=12`);
-    if (!response.ok) throw new Error('Gagal memuat data aktivitas terkini');
-    const data = await response.json();
-    if (Array.isArray(data) && data.length > 0) {
-      recentLives = data;
+    const recentResponse = await fetch(`https://api.jkt48connect.my.id/api/recent?api_key=${apiKey}&limit=8`);
+    if (!recentResponse.ok) throw new Error('Gagal memuat data aktivitas terkini');
+    const recentData = await recentResponse.json();
+    if (Array.isArray(recentData) && recentData.length > 0) {
+      recentLives = recentData;
     } else {
-      error = "Tidak ada data siaran langsung terkini.";
+      recentError = "Tidak ada data siaran langsung terkini.";
     }
   } catch (e) {
-    error = e.message || "Gagal memuat data siaran langsung terkini.";
+    recentError = e.message || "Gagal memuat data siaran langsung terkini.";
+  }
+
+  try {
+    const replayResponse = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/replay?apikey=${apiKey}`);
+    if (!replayResponse.ok) throw new Error('Gagal memuat data replay');
+    const replayData = await replayResponse.json();
+    if (Array.isArray(replayData) && replayData.length > 0) {
+      replayVideos = replayData;
+    } else {
+      replayError = "Tidak ada data replay yang tersedia.";
+    }
+  } catch (e) {
+    replayError = e.message || "Gagal memuat data replay.";
   }
 
   return {
     props: {
       recentLives,
-      error,
+      replayVideos,
+      recentError,
+      replayError,
     },
   };
 }
@@ -82,15 +101,71 @@ const RecentLiveCard = ({ item }) => {
                 </div>
             </div>
         </div>
-    )
+    );
 };
 
-export default function HistoryPage({ recentLives, error }) {
+const ReplayCard = ({ item }) => {
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
+
+    return (
+        <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100 flex flex-col">
+            <a href={item.videoUrl} target="_blank" rel="noopener noreferrer" className="block">
+                <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
+                    <Image
+                        src={item.thumbnail}
+                        alt={`Thumbnail for ${item.title}`}
+                        layout="fill"
+                        objectFit="cover"
+                        className="group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                         <h3 className="font-bold text-white text-sm leading-tight drop-shadow-lg">
+                            {item.title}
+                        </h3>
+                    </div>
+                </div>
+            </a>
+            <div className="p-4 flex flex-col flex-grow justify-between">
+                <div className="flex items-center space-x-3">
+                    <div className="relative w-9 h-9">
+                         <Image
+                            src={item.channelImage}
+                            alt={`Logo ${item.channelName}`}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-full"
+                        />
+                    </div>
+                    <div>
+                        <p className="font-semibold text-sm text-slate-700">{item.channelName}</p>
+                        <p className="text-xs text-slate-500">{formatDate(item.publishedAt)}</p>
+                    </div>
+                </div>
+                 <div className="flex justify-end items-center text-sm text-slate-500 mt-3">
+                    <div className="flex items-center" title="Penonton">
+                        <FiEye className="mr-1.5" />
+                        <span>{parseInt(item.views).toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function HistoryPage({ recentLives, replayVideos, recentError, replayError }) {
   return (
     <>
       <Head>
-        <title>Riwayat Siaran - Jeketian</title>
-        <meta name="description" content="Arsip dan riwayat aktivitas live streaming member JKT48." />
+        <title>Riwayat Siaran & Tonton Ulang - Jeketian</title>
+        <meta name="description" content="Arsip dan riwayat aktivitas live streaming serta video tonton ulang dari JKT48." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -100,7 +175,7 @@ export default function HistoryPage({ recentLives, error }) {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="text-center mb-6">
             <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 drop-shadow-sm">
-              Riwayat Siaran
+              Riwayat & Tonton Ulang
             </h1>
           </div>
           
@@ -113,13 +188,14 @@ export default function HistoryPage({ recentLives, error }) {
             </Link>
           </div>
 
-           <section>
+          <div className="max-w-7xl mx-auto space-y-16">
+            <section>
               <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
                 <FiZap className="mr-3 text-yellow-500"/> Aktivitas Live Terkini
               </h2>
-              {error ? (
+              {recentError ? (
                 <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
-                  <p>{error}</p>
+                  <p>{recentError}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -127,6 +203,22 @@ export default function HistoryPage({ recentLives, error }) {
                 </div>
               )}
             </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                <FiYoutube className="mr-3 text-red-500"/> Tonton Ulang (Replay)
+              </h2>
+              {replayError ? (
+                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                  <p>{replayError}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {replayVideos.map((item) => <ReplayCard key={item.videoId} item={item} />)}
+                </div>
+              )}
+            </section>
+          </div>
         </div>
       </main>
 
