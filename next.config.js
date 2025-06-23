@@ -44,6 +44,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'image.showroom-cdn.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
