@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import { FiCalendar, FiChevronRight } from 'react-icons/fi';
+import { FiCalendar, FiExternalLink, FiArrowLeft } from 'react-icons/fi';
 
 export async function getServerSideProps() {
   let newsItems = [];
@@ -35,50 +35,13 @@ export async function getServerSideProps() {
   };
 }
 
-const NewsListItem = ({ item }) => {
+export default function NewsPage({ newsItems, error }) {
   const formatDate = (dateString) => {
     if (!dateString) return "Tanggal tidak tersedia";
     const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' };
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
-  
-  const iconBaseUrl = 'https://jkt48.com';
 
-  return (
-    <Link href={`/news/${item.id}`} legacyBehavior>
-      <a className="block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group transform hover:scale-[1.02] overflow-hidden border border-slate-100">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 w-20 h-20 flex items-center justify-center bg-slate-50 group-hover:bg-pink-50 transition-colors duration-300">
-            {item.label && (
-                <Image 
-                    src={`${iconBaseUrl}${item.label}`} 
-                    alt="Ikon Kategori" 
-                    width={48} 
-                    height={48} 
-                    objectFit="contain"
-                    className="transform group-hover:rotate-6 transition-transform duration-300"
-                />
-            )}
-          </div>
-          <div className="flex-grow p-4 sm:p-5">
-            <h3 className="font-bold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
-              {item.title}
-            </h3>
-            <p className="text-sm text-slate-500 mt-1 flex items-center">
-              <FiCalendar className="mr-1.5 text-slate-400" />
-              {formatDate(item.date)}
-            </p>
-          </div>
-          <div className="p-4 text-slate-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-transform duration-300">
-            <FiChevronRight size={24} />
-          </div>
-        </div>
-      </a>
-    </Link>
-  );
-};
-
-export default function NewsPage({ newsItems, error }) {
   return (
     <>
       <Head>
@@ -91,10 +54,19 @@ export default function NewsPage({ newsItems, error }) {
 
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="text-center mb-10 md:mb-12">
+          <div className="text-center mb-6">
             <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
               Arsip Berita JKT48
             </h1>
+          </div>
+
+          <div className="text-center mb-10">
+            <Link href="/" legacyBehavior>
+              <a className="inline-flex items-center text-sm text-slate-600 hover:text-pink-600 font-medium transition-colors duration-300 group">
+                <FiArrowLeft className="mr-2 h-4 w-4 transform group-hover:-translate-x-1 transition-transform" />
+                Kembali ke Halaman Utama
+              </a>
+            </Link>
           </div>
 
           {error ? (
@@ -102,10 +74,46 @@ export default function NewsPage({ newsItems, error }) {
               <p>{error}</p>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto space-y-4">
-              {newsItems.map((item) => (
-                <NewsListItem key={item.id} item={item} />
-              ))}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {newsItems.map((item) => {
+                const iconBaseUrl = 'https://jkt48.com';
+                let localIconPath = item.label ? `${iconBaseUrl}${item.label}` : null;
+                
+                return (
+                  <div key={item.id} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
+                    <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[5rem] sm:min-h-[7rem]">
+                          {item.title || "Judul tidak tersedia"}
+                        </h3>
+                        <p className="text-xs text-slate-500 mb-3 flex items-center">
+                          <FiCalendar className="mr-2 text-slate-400" />
+                          {formatDate(item.date)}
+                        </p>
+                        {localIconPath && (
+                          <div className="mt-2 flex items-center text-xs text-gray-500">
+                            <Image 
+                              src={localIconPath} 
+                              alt="Ikon Kategori Berita" 
+                              width={32} 
+                              height={32} 
+                              className="inline-block object-contain" 
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <Link href={`/news/${item.id}`} legacyBehavior>
+                          <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
+                            Baca Selengkapnya
+                            <FiExternalLink className="ml-2 h-4 w-4" />
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
