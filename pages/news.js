@@ -35,7 +35,7 @@ export async function getServerSideProps() {
   };
 }
 
-const NewsCard = ({ item }) => {
+const NewsListItem = ({ item }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "Tanggal tidak tersedia";
     const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' };
@@ -46,31 +46,30 @@ const NewsCard = ({ item }) => {
 
   return (
     <Link href={`/news/${item.id}`} legacyBehavior>
-      <a className="block bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100">
-        <div className="flex flex-col sm:flex-row items-center">
-          <div className="flex-shrink-0 w-full sm:w-28 h-24 sm:h-full flex items-center justify-center bg-slate-50 group-hover:bg-pink-50 transition-colors duration-300 relative">
-             <div className="absolute top-0 left-0 w-full h-full bg-subtle-grid bg-cover opacity-30"></div>
+      <a className="block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group transform hover:scale-[1.02] overflow-hidden border border-slate-100">
+        <div className="flex items-center">
+          <div className="flex-shrink-0 w-20 h-20 flex items-center justify-center bg-slate-50 group-hover:bg-pink-50 transition-colors duration-300">
             {item.label && (
                 <Image 
                     src={`${iconBaseUrl}${item.label}`} 
                     alt="Ikon Kategori" 
-                    width={64} 
-                    height={64} 
+                    width={48} 
+                    height={48} 
                     objectFit="contain"
-                    className="transform group-hover:scale-110 transition-transform duration-300"
+                    className="transform group-hover:rotate-6 transition-transform duration-300"
                 />
             )}
           </div>
-          <div className="flex-grow p-5">
-            <h3 className="text-md md:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
+          <div className="flex-grow p-4 sm:p-5">
+            <h3 className="font-bold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
               {item.title}
             </h3>
-            <p className="text-xs text-slate-500 mt-2 flex items-center">
-              <FiCalendar className="mr-2 text-slate-400" />
+            <p className="text-sm text-slate-500 mt-1 flex items-center">
+              <FiCalendar className="mr-1.5 text-slate-400" />
               {formatDate(item.date)}
             </p>
           </div>
-          <div className="hidden sm:flex items-center justify-center p-6 text-slate-300 group-hover:text-pink-500 transition-colors duration-300">
+          <div className="p-4 text-slate-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-transform duration-300">
             <FiChevronRight size={24} />
           </div>
         </div>
@@ -103,9 +102,9 @@ export default function NewsPage({ newsItems, error }) {
               <p>{error}</p>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto space-y-5">
+            <div className="max-w-4xl mx-auto space-y-4">
               {newsItems.map((item) => (
-                <NewsCard key={item.id} item={item} />
+                <NewsListItem key={item.id} item={item} />
               ))}
             </div>
           )}
