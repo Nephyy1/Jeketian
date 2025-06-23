@@ -3,54 +3,83 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import { FiCalendar, FiExternalLink } from 'react-icons/fi';
+import { FiCalendar, FiChevronRight } from 'react-icons/fi';
 
 export async function getServerSideProps() {
-  const jkt48Api = require('@jkt48/core');
-  const apiKey = "48-NEPHYY";
-  
   let newsItems = [];
   let error = null;
-  let apiKeyError = null;
 
   try {
-    const checkResponse = await jkt48Api.check(apiKey);
-    if (checkResponse && (checkResponse.success === false || checkResponse.valid === false || checkResponse.status === 'error' || checkResponse.status === false)) {
-      apiKeyError = `API Key tidak valid atau bermasalah: ${checkResponse.message || 'Respons validasi tidak menunjukkan sukses.'}`;
+    const response = await fetch('https://v2.jkt48connect.my.id/api/jkt48/news?apikey=48-NEPHYY');
+    
+    if (!response.ok) {
+      throw new Error(`Gagal mengambil data: Status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data && Array.isArray(data.news) && data.news.length > 0) {
+      newsItems = data.news;
+    } else {
+      error = "Tidak ada berita yang ditemukan.";
     }
   } catch (e) {
-    apiKeyError = `Gagal validasi API Key: ${e.message || "Kesalahan tidak diketahui saat validasi."}`;
-  }
-
-  if (!apiKeyError) {
-    try {
-      const newsDataResponse = await jkt48Api.news(apiKey);
-      if (newsDataResponse && newsDataResponse.news && Array.isArray(newsDataResponse.news)) {
-        newsItems = newsDataResponse.news;
-      } else {
-        error = "Format data berita tidak sesuai.";
-      }
-    } catch (e) {
-      error = `Gagal memuat berita: ${e.message || "Kesalahan tidak diketahui"}`;
-    }
+    error = e.message || "Terjadi kesalahan saat menghubungi API.";
   }
 
   return {
     props: {
       newsItems,
       error,
-      apiKeyError,
     },
   };
 }
 
-export default function NewsPage({ newsItems, error, apiKeyError }) {
+const NewsCard = ({ item }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "Tanggal tidak tersedia";
     const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' };
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
+  
+  const iconBaseUrl = 'https://jkt48.com';
 
+  return (
+    <Link href={`/news/${item.id}`} legacyBehavior>
+      <a className="block bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100">
+        <div className="flex flex-col sm:flex-row items-center">
+          <div className="flex-shrink-0 w-full sm:w-28 h-24 sm:h-full flex items-center justify-center bg-slate-50 group-hover:bg-pink-50 transition-colors duration-300 relative">
+             <div className="absolute top-0 left-0 w-full h-full bg-subtle-grid bg-cover opacity-30"></div>
+            {item.label && (
+                <Image 
+                    src={`${iconBaseUrl}${item.label}`} 
+                    alt="Ikon Kategori" 
+                    width={64} 
+                    height={64} 
+                    objectFit="contain"
+                    className="transform group-hover:scale-110 transition-transform duration-300"
+                />
+            )}
+          </div>
+          <div className="flex-grow p-5">
+            <h3 className="text-md md:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors duration-300 leading-tight">
+              {item.title}
+            </h3>
+            <p className="text-xs text-slate-500 mt-2 flex items-center">
+              <FiCalendar className="mr-2 text-slate-400" />
+              {formatDate(item.date)}
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center justify-center p-6 text-slate-300 group-hover:text-pink-500 transition-colors duration-300">
+            <FiChevronRight size={24} />
+          </div>
+        </div>
+      </a>
+    </Link>
+  );
+};
+
+export default function NewsPage({ newsItems, error }) {
   return (
     <>
       <Head>
@@ -63,77 +92,22 @@ export default function NewsPage({ newsItems, error, apiKeyError }) {
 
       <main className="pt-16 min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-16">
-          {apiKeyError ? (
-            <div className="text-center">
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md max-w-lg mx-auto" role="alert">
-                <p className="font-bold text-lg mb-2">Validasi API Key Gagal</p>
-                <p className="text-sm">{apiKeyError}</p>
-              </div>
+          <div className="text-center mb-10 md:mb-12">
+            <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
+              Arsip Berita JKT48
+            </h1>
+          </div>
+
+          {error ? (
+            <div className="text-center text-red-500 bg-red-100 p-6 rounded-lg max-w-lg mx-auto shadow-sm">
+              <p>{error}</p>
             </div>
           ) : (
-            <>
-              <div className="text-center mb-10 md:mb-12">
-                <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
-                  Arsip Berita JKT48
-                </h1>
-              </div>
-
-              {error ? (
-                 <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg max-w-lg mx-auto shadow-sm">
-                  <p>{error}</p>
-                </div>
-              ) : (
-                newsItems && newsItems.length > 0 ? (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    {newsItems.map((item) => {
-                      let localIconPath = null;
-                      if (item.label) {
-                        const labelParts = item.label.split('/');
-                        const filename = labelParts.pop();
-                        if (filename) {
-                          localIconPath = `/img/${filename}`;
-                        }
-                      }
-                      return (
-                        <div key={item.id || item.title} className="p-0.5 bg-gradient-to-br from-pink-400 via-purple-400 to-orange-300 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
-                          <div className="bg-white rounded-lg p-5 h-full flex flex-col justify-between">
-                            <div>
-                              <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-600 transition-colors duration-300 leading-tight min-h-[3.5rem]">
-                                {item.title || "Judul tidak tersedia"}
-                              </h3>
-                              <p className="text-xs text-slate-500 mb-3 flex items-center">
-                                <FiCalendar className="mr-2 text-slate-400" />
-                                {formatDate(item.date)}
-                              </p>
-                              {localIconPath && (
-                                <div className="mt-2 flex items-center text-xs text-gray-500">
-                                  <span className="mr-1.5">Kategori:</span>
-                                  <Image src={localIconPath} alt="Ikon Kategori Berita" width={40} height={40} className="inline-block object-contain" onError={(e) => { e.target.style.display = 'none'; }}/>
-                                </div>
-                              )}
-                            </div>
-                            <div className="mt-4">
-                              {item.id ? (
-                                <Link href={`/news/${item.id}`} legacyBehavior>
-                                  <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-medium transition-colors duration-300">
-                                    Baca Selengkapnya
-                                    <FiExternalLink className="ml-2 h-4 w-4" />
-                                  </a>
-                                </Link>
-                              ) : (
-                                <span className="inline-flex items-center text-sm text-gray-400 font-medium">(Detail tidak tersedia)</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-center text-slate-500">Tidak ada berita yang ditemukan.</p>
-                )
-              )}
-            </>
+            <div className="max-w-4xl mx-auto space-y-5">
+              {newsItems.map((item) => (
+                <NewsCard key={item.id} item={item} />
+              ))}
+            </div>
           )}
         </div>
       </main>
