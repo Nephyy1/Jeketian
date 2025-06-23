@@ -3,34 +3,48 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import { FiRadio, FiYoutube, FiVideo, FiPlayCircle, FiArrowLeft, FiClock } from 'react-icons/fi';
+import { FiRadio, FiYoutube, FiVideo, FiPlayCircle, FiArrowLeft, FiClock, FiEye } from 'react-icons/fi';
 
 export async function getServerSideProps() {
+  const apiKey = "48-NEPHYY";
+  
   let liveStreams = [];
-  let error = null;
+  let showroomLives = [];
+  let liveError = null;
+  let showroomError = null;
 
   try {
-    const response = await fetch('https://v2.jkt48connect.my.id/api/jkt48/live?apikey=48-NEPHYY');
-    
-    if (!response.ok) {
-      throw new Error(`Gagal mengambil data: Status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (data && Array.isArray(data) && data.length > 0) {
-      liveStreams = data;
+    const liveResponse = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/live?apikey=${apiKey}`);
+    if (!liveResponse.ok) throw new Error('Gagal memuat data live');
+    const liveData = await liveResponse.json();
+    if (liveData && Array.isArray(liveData) && liveData.length > 0) {
+      liveStreams = liveData;
     } else {
-      error = "Tidak ada yang sedang live saat ini.";
+      liveError = "Tidak ada yang sedang live saat ini.";
     }
   } catch (e) {
-    error = e.message || "Terjadi kesalahan saat menghubungi API.";
+    liveError = e.message || "Gagal memuat data live stream.";
+  }
+
+  try {
+    const showroomResponse = await fetch(`https://api.jkt48connect.my.id/api/live/showroom?api_key=${apiKey}`);
+    if (!showroomResponse.ok) throw new Error('Gagal memuat data Showroom');
+    const showroomData = await showroomResponse.json();
+    if (showroomData.success && Array.isArray(showroomData.lives) && showroomData.lives.length > 0) {
+      showroomLives = showroomData.lives;
+    } else {
+      showroomError = "Tidak ada member yang live di Showroom saat ini.";
+    }
+  } catch (e) {
+    showroomError = e.message || "Gagal memuat data Showroom.";
   }
 
   return {
     props: {
       liveStreams,
-      error,
+      showroomLives,
+      liveError,
+      showroomError,
     },
   };
 }
@@ -104,12 +118,51 @@ const LiveCard = ({ item }) => {
     );
 };
 
-export default function LiveReplyPage({ liveStreams, error }) {
+const ShowroomCard = ({ item }) => {
+    const watchUrl = `https://www.showroom-live.com/r/${item.roomUrlKey}`;
+
+    return (
+        <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100 flex flex-col">
+            <a href={watchUrl} target="_blank" rel="noopener noreferrer" className="block">
+                <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
+                    <Image
+                        src={item.thumbnailUrl}
+                        alt={`Thumbnail for ${item.name}`}
+                        layout="fill"
+                        objectFit="cover"
+                        className="group-hover:scale-105 transition-transform duration-300"
+                    />
+                     <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center">
+                        <div className="w-2 h-2 bg-white rounded-full mr-1.5"></div>
+                        LIVE
+                    </div>
+                </div>
+            </a>
+            <div className="p-4 flex flex-col flex-grow">
+                <h3 className="font-bold text-slate-800 leading-tight flex-grow group-hover:text-pink-600 transition-colors">
+                    {item.name}
+                </h3>
+                <div className="flex justify-between items-center text-sm text-slate-500 mt-3">
+                    <div className="flex items-center">
+                        <PlatformIcon type="showroom" />
+                        <span className="ml-2">Showroom</span>
+                    </div>
+                    <div className="flex items-center" title="Penonton">
+                        <FiEye className="mr-1.5" />
+                        <span>{item.viewers.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function LiveReplyPage({ liveStreams, showroomLives, liveError, showroomError }) {
   return (
     <>
       <Head>
         <title>Live Streaming - Jeketian</title>
-        <meta name="description" content="Tonton streaming langsung dari member JKT48." />
+        <meta name="description" content="Tonton streaming langsung dari member JKT48 di berbagai platform." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -132,15 +185,37 @@ export default function LiveReplyPage({ liveStreams, error }) {
             </Link>
           </div>
 
-          {error ? (
-            <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg max-w-lg mx-auto shadow-sm">
-              <p>{error}</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {liveStreams.map((item, index) => <LiveCard key={item.room_id || index} item={item} />)}
-            </div>
-          )}
+          <div className="max-w-7xl mx-auto space-y-16">
+            <section>
+                <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                    <FiRadio className="mr-3 text-red-500"/> Live di Berbagai Platform
+                </h2>
+                {liveError ? (
+                    <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                    <p>{liveError}</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {liveStreams.map((item, index) => <LiveCard key={item.room_id || index} item={item} />)}
+                    </div>
+                )}
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                <FiVideo className="mr-3 text-sky-500"/> JKT48 Showroom
+              </h2>
+              {showroomError ? (
+                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                  <p>{showroomError}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {showroomLives.map((item) => <ShowroomCard key={item.roomId} item={item} />)}
+                </div>
+              )}
+            </section>
+          </div>
         </div>
       </main>
 
