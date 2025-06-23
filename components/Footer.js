@@ -24,16 +24,16 @@ export default function Footer() {
           <div className="md:mx-auto">
             <h3 className="font-semibold text-slate-900 tracking-wider mb-4">Navigasi</h3>
             <nav className="flex flex-col space-y-2">
-              <Link href="/" legacyBehavior><a className="hover:text-pink-600 transition-colors">Home</a></Link>
               <Link href="/news" legacyBehavior><a className="hover:text-pink-600 transition-colors">News</a></Link>
-              <Link href="/live-reply" legacyBehavior><a className="hover:text-pink-600 transition-colors">Live & Reply</a></Link>
+              <Link href="/schedule" legacyBehavior><a className="hover:text-pink-600 transition-colors">Schedule</a></Link>
+              <Link href="/history" legacyBehavior><a className="hover:text-pink-600 transition-colors">Riwayat Siaran</a></Link>
             </nav>
           </div>
 
           <div className="md:ml-auto">
             <h3 className="font-semibold text-slate-900 tracking-wider mb-4">Ikuti JKT48</h3>
             <div className="flex justify-center space-x-6 md:justify-start">
-              <a href="https://www.youtube.com/user/JKT48" target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-red-500 transition-colors"><FiYoutube /></a>
+              <a href="https://www.youtube.com/c/JKT48" target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-red-500 transition-colors"><FiYoutube /></a>
               <a href="https://www.x.com/officialJKT48" target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-sky-400 transition-colors"><FiTwitter /></a>
               <a href="https://www.instagram.com/jkt48" target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-pink-500 transition-colors"><FiInstagram /></a>
               <a href="https://www.tiktok.com/@jkt48.official" target="_blank" rel="noopener noreferrer" className="text-2xl text-slate-500 hover:text-slate-900 transition-colors"><FaTiktok /></a>
