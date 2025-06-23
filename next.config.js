@@ -51,8 +51,14 @@ const nextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'http',
         hostname: 'googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'yt3.ggpht.com',
         port: '',
         pathname: '/**',
       },
