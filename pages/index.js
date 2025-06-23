@@ -1,12 +1,10 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
 import BannerSlider from '../components/BannerSlider';
-import Footer from '../components/Footer';
 import Image from 'next/image';
 import { 
     FiFilm, FiUsers, FiCalendar, FiInfo, 
-    FiExternalLink, FiMapPin, FiChevronDown, FiChevronUp, FiGift,
+    FiExternalLink, FiChevronDown, FiChevronUp, FiGift,
     FiHelpCircle
 } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
@@ -21,7 +19,6 @@ const GlobalSwiperStyles = () => (
     }
   `}</style>
 );
-
 
 export async function getServerSideProps() {
   const jkt48Api = require('@jkt48/core');
@@ -162,8 +159,6 @@ export default function HomePage({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
-
       <main className="pt-16 min-h-screen bg-gray-50">
         {apiKeyError ? (
           <div className="container mx-auto px-4 py-10 text-center">
@@ -252,8 +247,6 @@ export default function HomePage({
           </>
         )}
       </main>
-
-      <Footer />
     </>
   );
 }
