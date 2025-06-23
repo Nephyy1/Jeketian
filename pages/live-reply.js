@@ -3,15 +3,17 @@ import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import { FiRadio, FiYoutube, FiVideo, FiPlayCircle, FiArrowLeft, FiClock, FiEye } from 'react-icons/fi';
+import { FiRadio, FiYoutube, FiVideo, FiPlayCircle, FiArrowLeft, FiClock, FiEye, FiZap } from 'react-icons/fi';
 
 export async function getServerSideProps() {
   const apiKey = "48-NEPHYY";
   
   let liveStreams = [];
   let showroomLives = [];
+  let recentLives = [];
   let liveError = null;
   let showroomError = null;
+  let recentError = null;
 
   try {
     const liveResponse = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/live?apikey=${apiKey}`);
@@ -39,12 +41,27 @@ export async function getServerSideProps() {
     showroomError = e.message || "Gagal memuat data Showroom.";
   }
 
+  try {
+    const recentResponse = await fetch(`https://api.jkt48connect.my.id/api/recent?api_key=${apiKey}&limit=8`);
+    if (!recentResponse.ok) throw new Error('Gagal memuat data recent live');
+    const recentData = await recentResponse.json();
+    if (Array.isArray(recentData) && recentData.length > 0) {
+      recentLives = recentData;
+    } else {
+      recentError = "Tidak ada data siaran langsung terkini.";
+    }
+  } catch (e) {
+    recentError = e.message || "Gagal memuat data siaran langsung terkini.";
+  }
+
   return {
     props: {
       liveStreams,
       showroomLives,
+      recentLives,
       liveError,
       showroomError,
+      recentError,
     },
   };
 }
@@ -157,12 +174,72 @@ const ShowroomCard = ({ item }) => {
     );
 };
 
-export default function LiveReplyPage({ liveStreams, showroomLives, liveError, showroomError }) {
+const RecentLiveCard = ({ item }) => {
+    const formatEndTime = (dateString) => {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Jakarta'
+        });
+    };
+
+    const formatDuration = (ms) => {
+        if (!ms) return 'N/A';
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        if (hours > 0) {
+            return `${hours}j ${minutes}m`;
+        }
+        return `${minutes}m`;
+    };
+
+    const thumbnailUrl = item.idn?.image || item.member?.img;
+
+    return (
+         <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100 flex flex-col">
+            <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
+                {thumbnailUrl &&
+                    <Image
+                        src={thumbnailUrl}
+                        alt={`Thumbnail for ${item.member.name}`}
+                        layout="fill"
+                        objectFit="cover"
+                    />
+                }
+            </div>
+            <div className="p-4 flex flex-col flex-grow">
+                <h3 className="font-bold text-slate-800 leading-tight flex-grow">
+                    {item.member.name}
+                </h3>
+                <div className="flex justify-between items-center text-xs text-slate-500 mt-3 border-t pt-3">
+                     <div className="flex items-center" title="Durasi">
+                        <FiClock className="mr-1.5" />
+                        <span>{formatDuration(item.live_info.duration)}</span>
+                    </div>
+                    <div className="flex items-center" title="Penonton">
+                        <FiEye className="mr-1.5" />
+                        <span>{item.live_info.viewers.num.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <PlatformIcon type={item.type} />
+                        <span className="ml-1.5 capitalize">{item.type}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default function LiveReplyPage({ liveStreams, showroomLives, recentLives, liveError, showroomError, recentError }) {
   return (
     <>
       <Head>
-        <title>Live Streaming - Jeketian</title>
-        <meta name="description" content="Tonton streaming langsung dari member JKT48 di berbagai platform." />
+        <title>Live Streaming & Aktivitas Terkini - Jeketian</title>
+        <meta name="description" content="Tonton streaming langsung dan lihat aktivitas terkini dari member JKT48." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -172,7 +249,7 @@ export default function LiveReplyPage({ liveStreams, showroomLives, liveError, s
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="text-center mb-6">
             <h1 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">
-              Live Streaming
+              Live & Aktivitas Terkini
             </h1>
           </div>
           
@@ -212,6 +289,21 @@ export default function LiveReplyPage({ liveStreams, showroomLives, liveError, s
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {showroomLives.map((item) => <ShowroomCard key={item.roomId} item={item} />)}
+                </div>
+              )}
+            </section>
+
+             <section>
+              <h2 className="text-2xl font-bold text-slate-700 mb-6 flex items-center">
+                <FiZap className="mr-3 text-yellow-500"/> Aktivitas Live Terkini
+              </h2>
+              {recentError ? (
+                <div className="text-center text-slate-500 bg-slate-100 p-6 rounded-lg shadow-sm">
+                  <p>{recentError}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {recentLives.map((item) => <RecentLiveCard key={item._id} item={item} />)}
                 </div>
               )}
             </section>
