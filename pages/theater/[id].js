@@ -32,19 +32,25 @@ export async function getServerSideProps(context) {
   }
 }
 
-const MemberPill = ({ member }) => (
+const MemberPill = ({ member }) => {
+  if (!member || !member.name) return null;
+
+  return (
     <div className="flex items-center space-x-3 bg-white p-2 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-        <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-            <Image
-                src={member.img_alt || member.img}
-                alt={member.name}
-                layout="fill"
-                objectFit="cover"
-            />
+        <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-slate-200">
+            {(member.img_alt || member.img) && (
+                <Image
+                    src={member.img_alt || member.img}
+                    alt={member.name}
+                    layout="fill"
+                    objectFit="cover"
+                />
+            )}
         </div>
         <span className="font-semibold text-sm text-slate-700">{member.name}</span>
     </div>
-);
+  );
+};
 
 export default function TheaterDetailPage({ show, error }) {
   if (error || !show) {
@@ -120,7 +126,7 @@ export default function TheaterDetailPage({ show, error }) {
             <div>
                 <h2 className="text-2xl font-bold text-slate-800 mb-6">Member yang Tampil</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {show.members && show.members.map(member => (
+                    {show.members && show.members.filter(member => member).map(member => (
                         <MemberPill key={member.id} member={member} />
                     ))}
                 </div>
