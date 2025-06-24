@@ -84,10 +84,6 @@ const LiveCard = ({ item }) => {
                         objectFit="cover"
                         className="group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-1.5"></div>
-                        LIVE
-                    </div>
                 </div>
             </a>
             <div className="p-4 flex flex-col flex-grow">
