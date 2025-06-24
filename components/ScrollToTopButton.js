@@ -28,17 +28,18 @@ export default function ScrollToTopButton() {
   }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {isVisible && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          className="p-3 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-          aria-label="Scroll to top"
-        >
-          <FiArrowUp size={24} />
-        </button>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={scrollToTop}
+      aria-label="Scroll to top"
+      className={`fixed bottom-6 right-6 z-50 p-3 rounded-full text-white shadow-lg
+        bg-gradient-to-br from-pink-500 to-orange-400 
+        transition-all duration-300 ease-in-out
+        hover:shadow-2xl hover:-translate-y-1.5
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500
+        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+    >
+      <FiArrowUp size={24} />
+    </button>
   );
 }
