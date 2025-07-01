@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FiRadio, FiYoutube, FiVideo, FiPlayCircle, FiArrowRight, FiClock, FiEye } from 'react-icons/fi';
 
 export async function getServerSideProps() {
-  const apiKey = "48-NEPHYY";
+  const apiKey = process.env.NEPHYY_APIKEY;
   let combinedLives = [];
   let error = null;
 
@@ -97,9 +97,9 @@ const LiveCard = ({ item }) => {
                     </div>
                     {item.viewers && (
                          <div className="flex items-center" title="Penonton">
-                            <FiEye className="mr-1.5" />
-                            <span>{item.viewers.toLocaleString('id-ID')}</span>
-                        </div>
+                             <FiEye className="mr-1.5" />
+                             <span>{item.viewers.toLocaleString('id-ID')}</span>
+                         </div>
                     )}
                 </div>
             </div>
@@ -109,12 +109,29 @@ const LiveCard = ({ item }) => {
 
 
 export default function LivePage({ liveStreams, error }) {
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = "Live Streaming JKT48 - Jeketian";
+  const description = "Nonton live streaming Showroom dan IDN Live dari member JKT48 secara langsung. Jangan ketinggalan momen seru mereka di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+  const canonicalUrl = `${siteUrl}/live`;
+
   return (
     <>
       <Head>
-        <title>Live Streaming - Jeketian</title>
-        <meta name="description" content="Tonton streaming langsung dari member JKT48." />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
