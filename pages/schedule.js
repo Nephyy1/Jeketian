@@ -6,9 +6,10 @@ import { FiCalendar, FiClock, FiUsers, FiGift, FiArrowLeft, FiExternalLink } fro
 export async function getServerSideProps() {
   let scheduleItems = [];
   let error = null;
+  const apiKey = process.env.NEPHYY_APIKEY;
 
   try {
-    const response = await fetch('https://v2.jkt48connect.my.id/api/jkt48/theater?apikey=48-NEPHYY');
+    const response = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/theater?apikey=${apiKey}`);
     
     if (!response.ok) {
       throw new Error(`Gagal mengambil data: Status ${response.status}`);
@@ -76,10 +77,10 @@ const ScheduleCard = ({ item }) => {
         </div>
         <div className="mt-5 pt-4 border-t border-slate-100">
            <Link href={`/theater/${item.id}`} legacyBehavior>
-              <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-semibold transition-colors duration-300">
-                Lihat Detail
-                <FiExternalLink className="ml-1.5 h-4 w-4" />
-              </a>
+             <a className="inline-flex items-center text-sm text-pink-500 group-hover:text-pink-700 font-semibold transition-colors duration-300">
+               Lihat Detail
+               <FiExternalLink className="ml-1.5 h-4 w-4" />
+             </a>
            </Link>
         </div>
       </div>
@@ -89,12 +90,29 @@ const ScheduleCard = ({ item }) => {
 
 
 export default function SchedulePage({ scheduleItems, error }) {
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = "Jadwal Teater JKT48 Terbaru - Jeketian";
+  const description = "Lihat jadwal pertunjukan teater JKT48 terbaru dan jangan lewatkan show idola favoritmu. Info lengkap di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+  const canonicalUrl = `${siteUrl}/schedule`;
+
   return (
     <>
       <Head>
-        <title>Jadwal Teater - Jeketian</title>
-        <meta name="description" content="Jadwal pertunjukan teater JKT48 terbaru." />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
