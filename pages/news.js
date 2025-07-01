@@ -6,9 +6,10 @@ import { FiCalendar, FiExternalLink, FiArrowLeft } from 'react-icons/fi';
 export async function getServerSideProps() {
   let newsItems = [];
   let error = null;
+  const apiKey = process.env.NEPHYY_APIKEY;
 
   try {
-    const response = await fetch('https://v2.jkt48connect.my.id/api/jkt48/news?apikey=48-NEPHYY');
+    const response = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/news?apikey=${apiKey}`);
     
     if (!response.ok) {
       throw new Error(`Gagal mengambil data: Status ${response.status}`);
@@ -40,12 +41,29 @@ export default function NewsPage({ newsItems, error }) {
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
 
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = "Arsip Berita JKT48 - Jeketian";
+  const description = "Jelajahi kumpulan berita dan pengumuman resmi terbaru dari JKT48. Dapatkan informasi terlengkap di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+  const canonicalUrl = `${siteUrl}/news`;
+
   return (
     <>
       <Head>
-        <title>Arsip Berita - Jeketian</title>
-        <meta name="description" content="Kumpulan berita dan pengumuman resmi terbaru dari JKT48." />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
