@@ -9,9 +9,10 @@ import { FaTiktok } from 'react-icons/fa';
 export async function getServerSideProps() {
   let members = [];
   let error = null;
+  const apiKey = process.env.NEPHYY_APIKEY;
 
   try {
-    const response = await fetch('https://v2.jkt48connect.my.id/api/jkt48/members?apikey=48-NEPHYY');
+    const response = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/members?apikey=${apiKey}`);
     
     if (!response.ok) {
       throw new Error(`Gagal mengambil data: Status ${response.status}`);
@@ -121,12 +122,29 @@ const MemberCard = ({ member }) => {
 };
 
 export default function MembersPage({ members, error }) {
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = "Daftar Member JKT48 - Jeketian";
+  const description = "Kenali lebih dekat semua member aktif JKT48. Lihat profil, foto, dan media sosial mereka di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+  const canonicalUrl = `${siteUrl}/members`;
+
   return (
     <>
       <Head>
-        <title>Daftar Member - Jeketian</title>
-        <meta name="description" content="Daftar lengkap member aktif JKT48." />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
