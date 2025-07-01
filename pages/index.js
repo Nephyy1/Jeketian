@@ -21,7 +21,7 @@ const GlobalSwiperStyles = () => (
 );
 
 export async function getServerSideProps() {
-  const apiKey = "48-NEPHYY";
+  const apiKey = process.env.NEPHYY_APIKEY;
   
   let newsItems = [];
   let eventItems = [];
@@ -183,13 +183,49 @@ export default function HomePage({
     { id: 3, question: "Bagaimana Cara Menonton Pertunjukan Teater JKT48?", answer: "Untuk menonton pertunjukan teater, Anda umumnya perlu membeli tiket melalui sistem ticketing resmi JKT48 yang diumumkan di website atau media sosial resmi JKT48. Perhatikan pengumuman jadwal show dan tata cara pembelian tiket karena seringkali ada sistem undian (lottery) atau penjualan terbatas, terutama untuk show populer." },
   ];
 
+  const siteUrl = "https://jeketian.web.id";
+  const siteTitle = "Jeketian - Fanbase JKT48 | Berita, Jadwal Theater, & Info Member";
+  const siteDescription = "Sumber informasi terlengkap untuk fans JKT48. Dapatkan berita terbaru, jadwal show teater dan event, profil member, dan konten eksklusif lainnya di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+
   return (
     <>
       <GlobalSwiperStyles />
       <Head>
-        <title>Jeketian - JKT48 Fan Hub</title>
-        <meta name="description" content="Website fan-made JKT48 yang didedikasikan untuk fans JKT48." />
+        <title>{siteTitle}</title>
+        <meta name="description" content={siteDescription} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={siteUrl} />
+        <meta name="author" content="Nephyy" />
+        <meta name="keywords" content="JKT48, Jeketian, Fanbase JKT48, Jadwal Theater JKT48, Berita JKT48, Member JKT48, Live JKT48" />
+        <meta property="og:title" content={siteTitle} />
+        <meta property="og:description" content={siteDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={siteTitle} />
+        <meta name="twitter:description" content={siteDescription} />
+        <meta name="twitter:image" content={socialBanner} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Jeketian",
+              "url": siteUrl,
+              "description": siteDescription,
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": `${siteUrl}/search?q={search_term_string}`,
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
@@ -232,7 +268,7 @@ export default function HomePage({
                 </div>
                 </div>
             </div>
-            </section>
+          </section>
           
           <section className="py-12 md:py-16">
             <div className="text-center mb-10 md:mb-12"><h2 className="inline-block text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-600 via-pink-500 to-purple-600 drop-shadow-sm">Hot News JKT48</h2></div>
