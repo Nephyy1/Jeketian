@@ -1,14 +1,13 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Navbar from '../../components/Navbar';
 import Image from 'next/image';
 import { FiCalendar, FiUser, FiArrowLeft } from 'react-icons/fi';
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
   const jkt48Api = require('@jkt48/core');
-  const apiKey = "48-NEPHYY";
+  const apiKey = process.env.NEPHYY_APIKEY;
   let newsDetailData = null;
   let newsDetailError = null;
 
@@ -68,10 +67,10 @@ export default function NewsDetailPage({ newsDetailData, newsDetailError, newsId
   if (newsDetailError) {
     return (
       <>
-        <Navbar />
         <div className="container mx-auto px-4 py-24 min-h-screen">
           <Head>
             <title>Error Memuat Berita - Jeketian</title>
+            <link rel="icon" href="/favicon.ico" />
           </Head>
           <div className="text-center bg-white p-8 rounded-lg shadow-xl max-w-md mx-auto">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Oops! Terjadi Kesalahan</h1>
@@ -87,14 +86,16 @@ export default function NewsDetailPage({ newsDetailData, newsDetailError, newsId
       </>
     );
   }
+  
+  const detail = newsDetailData?.data?.[0] || newsDetailData;
 
-  if (!newsDetailData || (newsDetailData.data && newsDetailData.data.length === 0 && !newsDetailData.title)) {
+  if (!detail || !detail.title) {
      return (
         <>
-          <Navbar />
           <div className="container mx-auto px-4 py-24 min-h-screen text-center">
             <Head>
               <title>Berita Tidak Ditemukan - Jeketian</title>
+              <link rel="icon" href="/favicon.ico" />
             </Head>
             <div className="bg-white p-8 rounded-lg shadow-xl max-w-md mx-auto">
                 <h1 className="text-2xl font-bold text-slate-700 mb-4">Berita Tidak Ditemukan</h1>
@@ -109,16 +110,69 @@ export default function NewsDetailPage({ newsDetailData, newsDetailError, newsId
         </>
       );
   }
-  
-  const detail = newsDetailData.data && newsDetailData.data[0] ? newsDetailData.data[0] : newsDetailData;
-  const { title, date, content, image } = detail;
 
+  const { title, date, content, image } = detail;
+  const siteUrl = "https://jeketian.web.id";
+  const canonicalUrl = `${siteUrl}/news/${newsId}`;
+  const pageTitle = `${title} | Jeketian`;
+  const metaDescription = content
+    ? content.replace(/<[^>]*>?/gm, '').substring(0, 155) + '...'
+    : `Baca berita JKT48 terbaru "${title}" di Jeketian.`;
+  const socialBanner = image || `${siteUrl}/img/logo.jpg`;
+  
   return (
     <>
-      <Navbar />
       <div className="bg-gray-50 py-8 pt-24 min-h-screen">
         <Head>
-          <title>{title || "Detail Berita"} - Jeketian</title>
+          <title>{pageTitle}</title>
+          <meta name="description" content={metaDescription} />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+          <link rel="canonical" href={canonicalUrl} />
+          <meta name="author" content="Nephyy" />
+          <meta name="keywords" content={`JKT48, Berita JKT48, Jeketian, ${title}`} />
+          <meta property="og:title" content={pageTitle} />
+          <meta property="og:description" content={metaDescription} />
+          <meta property="og:type" content="article" />
+          <meta property="og:url" content={canonicalUrl} />
+          <meta property="og:image" content={socialBanner} />
+          <meta property="og:site_name" content="Jeketian" />
+          <meta property="article:published_time" content={date} />
+          <meta property="article:author" content="Nephyy" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={pageTitle} />
+          <meta name="twitter:description" content={metaDescription} />
+          <meta name="twitter:image" content={socialBanner} />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "NewsArticle",
+                "mainEntityOfPage": {
+                  "@type": "WebPage",
+                  "@id": canonicalUrl
+                },
+                "headline": title,
+                "image": [socialBanner],
+                "datePublished": date,
+                "dateModified": date,
+                "author": {
+                  "@type": "Person",
+                  "name": "Nephyy"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Jeketian",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": `${siteUrl}/img/logo.jpg`
+                  }
+                },
+                "description": metaDescription
+              })
+            }}
+          />
         </Head>
 
         <div className="container mx-auto px-4">
