@@ -5,7 +5,7 @@ import { FiArrowLeft, FiCalendar, FiClock, FiGift, FiTicket, FiUsers } from 'rea
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
-  const apiKey = "48-NEPHYY";
+  const apiKey = process.env.NEPHYY_APIKEY;
   
   try {
     const response = await fetch(`https://v2.jkt48connect.my.id/api/jkt48/theater/${id}?apikey=${apiKey}`);
@@ -23,6 +23,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         show,
+        showId: id,
       },
     };
   } catch (e) {
@@ -50,16 +51,69 @@ const MemberPill = ({ member }) => {
   );
 };
 
-export default function TheaterDetailPage({ show }) {
+export default function TheaterDetailPage({ show, showId }) {
   const eventDate = new Date(show.date);
   const date = eventDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
   const time = eventDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
 
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = `${show.title} - Jadwal Teater JKT48`;
+  const description = `Detail jadwal dan member yang tampil pada pertunjukan teater JKT48 "${show.title}" pada tanggal ${date}.`;
+  const canonicalUrl = `${siteUrl}/theater/${showId}`;
+  const socialBanner = show.banner || `${siteUrl}/img/logo.jpg`;
+
   return (
     <>
       <Head>
-        <title>{show.title} - Jadwal Teater JKT48</title>
-        <meta name="description" content={`Detail pertunjukan ${show.title} pada ${date}.`} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "TheaterEvent",
+                "name": show.title,
+                "startDate": new Date(show.date).toISOString(),
+                "location": {
+                  "@type": "Place",
+                  "name": "Teater JKT48",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "fX Sudirman, Lantai 4",
+                    "addressLocality": "Jakarta",
+                    "addressCountry": "ID"
+                  }
+                },
+                "image": [socialBanner],
+                "description": description,
+                "performer": show.members?.map(member => ({
+                  "@type": "Person",
+                  "name": member.name
+                })) || [],
+                "offers": {
+                  "@type": "Offer",
+                  "url": "https://jkt48.com/theater/schedule",
+                  "price": "0",
+                  "priceCurrency": "IDR",
+                  "availability": "https://schema.org/InStock",
+                  "validFrom": new Date().toISOString()
+                }
+              })
+            }}
+        />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
@@ -118,13 +172,13 @@ export default function TheaterDetailPage({ show }) {
                         <h3 className="text-xl font-bold text-slate-800 mb-4 border-b pb-3">Detail Pertunjukan</h3>
                         <div className="space-y-4 text-slate-600">
                              <div className="flex items-start">
-                                <FiClock className="mr-3 mt-1 flex-shrink-0 text-slate-400" />
-                                <span>Pukul {time} WIB</span>
-                            </div>
+                                 <FiClock className="mr-3 mt-1 flex-shrink-0 text-slate-400" />
+                                 <span>Pukul {time} WIB</span>
+                             </div>
                              <div className="flex items-start">
-                                <FiUsers className="mr-3 mt-1 flex-shrink-0 text-slate-400" />
-                                <span>{show.member_count} Member Tampil</span>
-                            </div>
+                                 <FiUsers className="mr-3 mt-1 flex-shrink-0 text-slate-400" />
+                                 <span>{show.member_count} Member Tampil</span>
+                             </div>
                         </div>
                          <div className="mt-6">
                             <a 
@@ -136,7 +190,7 @@ export default function TheaterDetailPage({ show }) {
                                 <FiTicket className="mr-3"/>
                                 Info Tiket
                             </a>
-                        </div>
+                         </div>
                     </div>
                 </aside>
             </div>
