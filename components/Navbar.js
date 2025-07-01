@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiMenu, FiX, FiHome, FiUsers, FiCalendar, FiInfo, FiRadio } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiUsers, FiCalendar, FiInfo, FiRadio, FiFileText } from 'react-icons/fi';
 import { LuSparkles } from 'react-icons/lu';
 
 export default function Navbar() {
@@ -32,6 +32,7 @@ export default function Navbar() {
               <Link href="/schedule" className={navLinkClasses}>Schedule</Link>
               <Link href="/news" className={navLinkClasses}>News</Link>
               <Link href="/live" className={navLinkClasses}>Live</Link>
+              <Link href="/information" className={navLinkClasses}>Information</Link>
             </div>
           </div>
           <div className="md:hidden flex items-center">
@@ -67,12 +68,16 @@ export default function Navbar() {
             Schedule
           </Link>
           <Link href="/news" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
-            <FiInfo className="mr-3 h-5 w-5" />
+            <FiFileText className="mr-3 h-5 w-5" />
             News
           </Link>
           <Link href="/live" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             <FiRadio className="mr-3 h-5 w-5" />
             Live
+          </Link>
+          <Link href="/information" className={mobileNavLinkClasses} onClick={() => setIsOpen(false)}>
+            <FiInfo className="mr-3 h-5 w-5" />
+            Information
           </Link>
         </div>
       </div>
