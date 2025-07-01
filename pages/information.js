@@ -64,7 +64,7 @@ export default function InformationPage() {
                 Jika Anda memiliki pertanyaan, masukan, atau menemukan bug/kesalahan pada website, jangan ragu untuk menghubungi melalui email di bawah ini. Setiap masukan sangat kami hargai.
               </p>
               <div className="mt-4">
-                <a href="mailto:kontak@emailanda.com" className="font-semibold text-pink-600 hover:text-pink-700 transition-colors">
+                <a href="mailto:admin@jeketian.my.id" className="font-semibold text-pink-600 hover:text-pink-700 transition-colors">
                   kontak@emailanda.com
                 </a>
               </div>
