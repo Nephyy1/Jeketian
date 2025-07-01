@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FiArrowLeft, FiClock, FiEye, FiZap, FiYoutube, FiVideo, FiPlayCircle, FiRadio } from 'react-icons/fi';
 
 export async function getServerSideProps() {
-  const apiKey = "48-NEPHYY";
+  const apiKey = process.env.NEPHYY_APIKEY;
   
   let recentLives = [];
   let replayVideos = [];
@@ -68,7 +68,7 @@ const RecentLiveCard = ({ item }) => {
     const thumbnailUrl = item.idn?.image || item.member?.img;
 
     return (
-         <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100 flex flex-col">
+        <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1.5 overflow-hidden border border-slate-100 flex flex-col">
             <div className="aspect-w-16 aspect-h-9 relative bg-slate-200">
                 {thumbnailUrl &&
                     <Image
@@ -85,17 +85,17 @@ const RecentLiveCard = ({ item }) => {
                 </h3>
                 <div className="flex justify-between items-center text-xs text-slate-500 mt-3 border-t pt-3">
                      <div className="flex items-center" title="Durasi">
-                        <FiClock className="mr-1.5" />
-                        <span>{formatDuration(item.live_info.duration)}</span>
-                    </div>
-                    <div className="flex items-center" title="Penonton">
-                        <FiEye className="mr-1.5" />
-                        <span>{item.live_info.viewers.num.toLocaleString('id-ID')}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <PlatformIcon type={item.type} />
-                        <span className="ml-1.5 capitalize">{item.type}</span>
-                    </div>
+                         <FiClock className="mr-1.5" />
+                         <span>{formatDuration(item.live_info.duration)}</span>
+                     </div>
+                     <div className="flex items-center" title="Penonton">
+                         <FiEye className="mr-1.5" />
+                         <span>{item.live_info.viewers.num.toLocaleString('id-ID')}</span>
+                     </div>
+                     <div className="flex items-center">
+                         <PlatformIcon type={item.type} />
+                         <span className="ml-1.5 capitalize">{item.type}</span>
+                     </div>
                 </div>
             </div>
         </div>
@@ -126,8 +126,8 @@ const ReplayCard = ({ item }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-3 left-3 right-3">
                          <h3 className="font-bold text-white text-sm leading-tight drop-shadow-lg">
-                            {item.title}
-                        </h3>
+                             {item.title}
+                         </h3>
                     </div>
                 </div>
             </a>
@@ -135,12 +135,12 @@ const ReplayCard = ({ item }) => {
                 <div className="flex items-center space-x-3">
                     <div className="relative w-9 h-9">
                          <Image
-                            src={item.channelImage}
-                            alt={`Logo ${item.channelName}`}
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-full"
-                        />
+                             src={item.channelImage}
+                             alt={`Logo ${item.channelName}`}
+                             layout="fill"
+                             objectFit="cover"
+                             className="rounded-full"
+                         />
                     </div>
                     <div>
                         <p className="font-semibold text-sm text-slate-700">{item.channelName}</p>
@@ -148,23 +148,40 @@ const ReplayCard = ({ item }) => {
                     </div>
                 </div>
                  <div className="flex justify-end items-center text-sm text-slate-500 mt-3">
-                    <div className="flex items-center" title="Penonton">
-                        <FiEye className="mr-1.5" />
-                        <span>{parseInt(item.views).toLocaleString('id-ID')}</span>
-                    </div>
-                </div>
+                     <div className="flex items-center" title="Penonton">
+                         <FiEye className="mr-1.5" />
+                         <span>{parseInt(item.views).toLocaleString('id-ID')}</span>
+                     </div>
+                 </div>
             </div>
         </div>
     );
 };
 
 export default function HistoryPage({ recentLives, replayVideos, recentError, replayError }) {
+  const siteUrl = "https://jeketian.web.id";
+  const pageTitle = "Riwayat Siaran & Tonton Ulang JKT48 - Jeketian";
+  const description = "Temukan arsip dan riwayat aktivitas live streaming serta video tonton ulang (replay) dari para member JKT48 di Jeketian.";
+  const socialBanner = `${siteUrl}/img/logo.jpg`;
+  const canonicalUrl = `${siteUrl}/history`;
+
   return (
     <>
       <Head>
-        <title>Riwayat Siaran & Tonton Ulang - Jeketian</title>
-        <meta name="description" content="Arsip dan riwayat aktivitas live streaming serta video tonton ulang dari JKT48." />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={socialBanner} />
+        <meta property="og:site_name" content="Jeketian" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={socialBanner} />
       </Head>
 
       <main className="pt-16 min-h-screen bg-gray-50">
